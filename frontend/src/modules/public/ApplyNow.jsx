@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
 
 const API = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/public/apply';
@@ -14,8 +14,8 @@ const RE = {
 };
 
 const STEPS = ['Personal', 'Contact', 'Address', 'Documents', 'Education', 'Experience', 'Nominee', 'Application'];
-const GENDER_OPT = ['Male', 'Female', 'Other'];
-const MARITAL_OPT = ['Single', 'Married', 'Divorced', 'Widowed'];
+const GENDER_OPT = [{v:'MALE',l:'Male'},{v:'FEMALE',l:'Female'},{v:'OTHER',l:'Other'}];
+const MARITAL_OPT = [{v:'SINGLE',l:'Single'},{v:'MARRIED',l:'Married'},{v:'DIVORCED',l:'Divorced'},{v:'WIDOWED',l:'Widowed'}];
 const NOMINEE_REL = ['Father', 'Mother', 'Spouse', 'Son', 'Daughter', 'Brother', 'Sister', 'Other'];
 const NATIONALITY_OPT = ['Indian', 'American', 'British', 'Canadian', 'Australian', 'German', 'French', 'Chinese', 'Japanese', 'Russian', 'Brazilian', 'South African', 'Singaporean', 'UAE (Emirati)', 'Saudi Arabian', 'Others'];
 const QUAL_OPT = ['B.A', 'B.Com', 'B.Sc', 'B.Tech / B.E', 'BBA', 'BCA', 'M.A', 'M.Com', 'M.Sc', 'M.Tech / M.E', 'MBA', 'MCA', 'PhD', 'Diploma (Engineering)', 'Diploma (Management)', 'Other'];
@@ -106,7 +106,7 @@ const S = {
   hsub: { color:'#94a3b8', fontSize:17, maxWidth:520, margin:'0 auto 36px' },
   applyBtn: { background:'linear-gradient(135deg,#7c3aed,#2563eb)', border:'none', color:'#fff', fontSize:17, fontWeight:700, padding:'15px 44px', borderRadius:50, cursor:'pointer', boxShadow:'0 8px 32px rgba(124,58,237,.45)', transition:'transform .2s,box-shadow .2s', letterSpacing:.5 },
   card: { background:'rgba(255,255,255,.06)', backdropFilter:'blur(20px)', border:'1px solid rgba(255,255,255,.12)', borderRadius:20, padding:'36px 40px', maxWidth:820, margin:'0 auto 32px', boxShadow:'0 8px 40px rgba(0,0,0,.35)' },
-  progress: { display:'flex', justifyContent:'center', gap:0, marginBottom:36, flexWrap:'wrap', gap:4 },
+  progress: { display:'flex', justifyContent:'center', marginBottom:36, flexWrap:'wrap', gap:4 },
   stepDot: (active, done) => ({ width:34, height:34, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, fontWeight:700, cursor:'default', transition:'all .3s', background: done ? 'linear-gradient(135deg,#7c3aed,#2563eb)' : active ? 'rgba(124,58,237,.4)' : 'rgba(255,255,255,.08)', border: active ? '2px solid #7c3aed' : done ? '2px solid #7c3aed' : '2px solid rgba(255,255,255,.15)', color: done||active ? '#fff' : '#64748b' }),
   stepLbl: (active, done) => ({ fontSize:11, marginTop:4, color: active ? '#a78bfa' : done ? '#60a5fa' : '#475569', fontWeight: active||done ? 600 : 400 }),
   stepItem: { display:'flex', flexDirection:'column', alignItems:'center', minWidth:70 },

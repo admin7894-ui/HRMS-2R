@@ -123,7 +123,8 @@ const GenericModule = ({
     if (!form.effective_from) errs.effective_from = 'Effective from is required';
 
     fields.forEach(f => {
-      if (f.hidden || f.key === 'module_id' || f.key === 'Module_ID') return;
+      const isHidden = typeof f.hidden === 'function' ? f.hidden(form) : f.hidden;
+      if (isHidden || f.key === 'module_id' || f.key === 'Module_ID') return;
       const val = form[f.key];
       if (f.required && (val === undefined || val === null || val === ''))
         errs[f.key] = `${f.label} is required`;
@@ -194,7 +195,8 @@ const GenericModule = ({
   };
 
   const renderField = f => {
-    if (f.hidden || f.key === 'module_id' || f.key === 'Module_ID') return null;
+    const isHidden = typeof f.hidden === 'function' ? f.hidden(form) : f.hidden;
+    if (isHidden || f.key === 'module_id' || f.key === 'Module_ID') return null;
     const val = form[f.key] ?? '';
     const er = errors[f.key];
     const common = { name: f.key, value: val, onChange: handleChange, disabled: f.readOnly };
@@ -312,7 +314,8 @@ const GenericModule = ({
   const grouped = {};
   const noSection = [];
   fields.forEach(f => {
-    if (f.hidden || f.key === 'module_id' || f.key === 'Module_ID') return;
+    const isHidden = typeof f.hidden === 'function' ? f.hidden(form) : f.hidden;
+    if (isHidden || f.key === 'module_id' || f.key === 'Module_ID') return;
     if (f.section) { if (!grouped[f.section]) grouped[f.section] = []; grouped[f.section].push(f); }
     else noSection.push(f);
   });
