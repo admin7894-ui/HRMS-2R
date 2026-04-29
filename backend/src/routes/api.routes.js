@@ -272,7 +272,28 @@ r.delete('/hire-records/:id',           hrCtrl.remove);
 r.patch('/hire-records/:id/toggle-status', hrCtrl.toggleStatus);
 
 wire('employees',            'employees',            ['First_Name', 'Last_Name', 'Email_ID']);
-wire('bank-accounts',        'bank_accounts',        ['Bank_Name', 'Account_Number']);
+// Bank Accounts — enrich with _empName
+const baCtrl = makeController('bank_accounts', ['Bank_Name', 'Account_Number']);
+r.get('/bank-accounts', (req, res) => {
+  try {
+    let all = db.bank_accounts || [];
+    if (req.query.q) { const lq=req.query.q.toLowerCase(); all=all.filter(x=>['Bank_Name','Account_Number'].some(f=>String(x[f]??'').toLowerCase().includes(lq))); }
+    const skip = new Set(['q','page','limit','sortBy','sortOrder']);
+    Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k)&&v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
+    if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
+    all = all.map(x => {
+      const emp = (db.employees||[]).find(e => e.id === x.HRMS_Employee_ID);
+      return { ...x, _empName: emp ? `${emp.First_Name} ${emp.Last_Name}`.trim() : null };
+    });
+    const pg=Math.max(1,+req.query.page||1), lim=Math.min(200,+req.query.limit||10);
+    res.json({ success:true, data:all.slice((pg-1)*lim,pg*lim), total:all.length, page:pg, limit:lim, pages:Math.ceil(all.length/lim) });
+  } catch(e) { err(res,e.message,500); }
+});
+r.get('/bank-accounts/:id',              baCtrl.get);
+r.post('/bank-accounts',                 baCtrl.create);
+r.put('/bank-accounts/:id',              baCtrl.update);
+r.delete('/bank-accounts/:id',           baCtrl.remove);
+r.patch('/bank-accounts/:id/toggle-status', baCtrl.toggleStatus);
 wire('programs',             'programs',             ['Program_Name', 'Program_Code'], 'Program_Code', 'Program_Name');
 // Enrollments — enrich with _empName and _programName
 const enCtrl = makeController('enrollments', ['completion_status']);
@@ -299,8 +320,64 @@ r.put('/enrollments/:id',              enCtrl.update);
 r.delete('/enrollments/:id',           enCtrl.remove);
 r.patch('/enrollments/:id/toggle-status', enCtrl.toggleStatus);
 
-wire('assignments',          'assignments',          ['assignment_type']);
-wire('supervisors',          'supervisors',          ['HRMS_employee_id']);
+// Assignments — enrich with _empName, _deptName, _posName
+const asgCtrl = makeController('assignments', ['assignment_type']);
+r.get('/assignments', (req, res) => {
+  try {
+    let all = db.assignments || [];
+    if (req.query.q) { const lq=req.query.q.toLowerCase(); all=all.filter(x=>String(x.assignment_type??'').toLowerCase().includes(lq)); }
+    const skip = new Set(['q','page','limit','sortBy','sortOrder']);
+    Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k)&&v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
+    if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
+    all = all.map(x => {
+      const emp = (db.employees||[]).find(e => e.id === x.HRMS_employee_id);
+      const dept = (db.departments||[]).find(d => d.id === x.HRMS_department_id);
+      const pos = (db.positions||[]).find(p => p.id === x.HRMS_position_id);
+      return { 
+        ...x, 
+        _empName:  emp  ? `${emp.First_Name} ${emp.Last_Name}`.trim() : null,
+        _deptName: dept ? dept.Department_Name : null,
+        _posName:  pos  ? pos.Position_Name : null
+      };
+    });
+    const pg=Math.max(1,+req.query.page||1), lim=Math.min(200,+req.query.limit||10);
+    res.json({ success:true, data:all.slice((pg-1)*lim,pg*lim), total:all.length, page:pg, limit:lim, pages:Math.ceil(all.length/lim) });
+  } catch(e) { err(res,e.message,500); }
+});
+r.get('/assignments/:id',              asgCtrl.get);
+r.post('/assignments',                 asgCtrl.create);
+r.put('/assignments/:id',              asgCtrl.update);
+r.delete('/assignments/:id',           asgCtrl.remove);
+r.patch('/assignments/:id/toggle-status', asgCtrl.toggleStatus);
+// Supervisors — enrich with _empName, _asnName, _supName
+const supCtrl = makeController('supervisors', ['HRMS_employee_id']);
+r.get('/supervisors', (req, res) => {
+  try {
+    let all = db.supervisors || [];
+    if (req.query.q) { const lq=req.query.q.toLowerCase(); all=all.filter(x=>String(x.HRMS_employee_id??'').toLowerCase().includes(lq)); }
+    const skip = new Set(['q','page','limit','sortBy','sortOrder']);
+    Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k)&&v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
+    if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
+    all = all.map(x => {
+      const emp = (db.employees||[]).find(e => e.id === x.HRMS_employee_id);
+      const asn = (db.assignments||[]).find(a => a.id === x.HRMS_assignment_id);
+      const sup = (db.employees||[]).find(e => e.id === x.supervisor_employee_id);
+      return { 
+        ...x, 
+        _empName: emp ? `${emp.First_Name} ${emp.Last_Name}`.trim() : null,
+        _asnName: asn ? (asn._displayId || asn.id) : null,
+        _supName: sup ? `${sup.First_Name} ${sup.Last_Name}`.trim() : null
+      };
+    });
+    const pg=Math.max(1,+req.query.page||1), lim=Math.min(200,+req.query.limit||10);
+    res.json({ success:true, data:all.slice((pg-1)*lim,pg*lim), total:all.length, page:pg, limit:lim, pages:Math.ceil(all.length/lim) });
+  } catch(e) { err(res,e.message,500); }
+});
+r.get('/supervisors/:id',              supCtrl.get);
+r.post('/supervisors',                 supCtrl.create);
+r.put('/supervisors/:id',              supCtrl.update);
+r.delete('/supervisors/:id',           supCtrl.remove);
+r.patch('/supervisors/:id/toggle-status', supCtrl.toggleStatus);
 wire('employee-histories',   'employee_histories',   ['change_type', 'field_changed']);
 wire('holidays',             'holidays',             ['holiday_name', 'holiday_type']);
 wire('absence-types',        'absence_types',        ['absence_name', 'absence_code'], 'absence_code', 'absence_name');

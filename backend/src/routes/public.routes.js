@@ -37,4 +37,14 @@ r.get('/job-postings', (req, res) => {
   }
 });
 
+// Public: fetch active companies
+r.get('/companies', (req, res) => {
+  try {
+    const companies = (db.companies || []).filter(c => c.active_flag === 'Y');
+    ok(res, companies, 'Active companies');
+  } catch (e) {
+    err(res, e.message, 500);
+  }
+});
+
 module.exports = r;

@@ -19,17 +19,41 @@ function HireRecordAutoFill({ form, setForm }) {
     api.get('/hire-records/' + id).then(result => {
       const hr = result?.data;
       if (!hr) return;
-      setForm(p => ({
-        ...p,
-        Employee_Type:       hr.Employee_Type        || p.Employee_Type,
-        HRMS_Department_ID:  hr.HRMS_Department_ID   || p.HRMS_Department_ID,
-        HRMS_Position_ID:    hr.HRMS_Position_ID     || p.HRMS_Position_ID,
-        HRMS_Grade_ID:       hr.HRMS_Grade_ID        || p.HRMS_Grade_ID,
-        Date_of_Joining:     hr.Date_of_Joining      || p.Date_of_Joining,
-        Hired_Salary:        hr.Hired_Salary         || p.Hired_Salary,
-      }));
+
+      const getUpdates = (p, app = {}) => {
+        const updates = {
+          Employee_Type:       hr.Employee_Type        || p.Employee_Type,
+          HRMS_Department_ID:  hr.HRMS_Department_ID   || p.HRMS_Department_ID,
+          HRMS_Position_ID:    hr.HRMS_Position_ID     || p.HRMS_Position_ID,
+          HRMS_Grade_ID:       hr.HRMS_Grade_ID        || p.HRMS_Grade_ID,
+          Date_of_Joining:     hr.Date_of_Joining      || p.Date_of_Joining,
+          Hired_Salary:        hr.Hired_Salary         || p.Hired_Salary,
+        };
+        const fieldsToFill = [
+          'First_Name', 'Middle_Name', 'Last_Name', 'Date_of_Birth', 'Gender', 'Marital_Status', 'Nationality',
+          'Email_ID', 'Phone_Number', 'Alternate_Phone', 'Emergency_Contact_Name', 'Emergency_Contact_Number',
+          'Address_Line1', 'Address_Line2', 'City', 'State', 'Country', 'Pincode',
+          'Qualification', 'Degree_Name', 'Specialization', 'University_Name', 'Institute_Name', 'Edu_Start_Year', 'Edu_End_Year', 'Percentage',
+          'Is_Fresher', 'Prev_Company_Name', 'Industry_Type', 'Prev_Department', 'Prev_Designation', 'Total_Experience', 'Last_Drawn_Salary', 'Reason_For_Leaving',
+          'Nominee_Name', 'Nominee_Relationship', 'Nominee_Date_of_Birth', 'Nominee_Contact_Number'
+        ];
+        fieldsToFill.forEach(field => {
+          if (app[field] !== null && app[field] !== undefined && app[field] !== '') {
+            updates[field] = app[field];
+          }
+        });
+        return { ...p, ...updates };
+      };
+
+      if (hr.HRMS_Application_ID) {
+        api.get('/applications/' + hr.HRMS_Application_ID).then(appRes => {
+          setForm(p => getUpdates(p, appRes?.data || {}));
+        }).catch(() => setForm(p => getUpdates(p)));
+      } else {
+        setForm(p => getUpdates(p));
+      }
     }).catch(() => {});
-  }, [form.Hire_Record_ID]);
+  }, [form.Hire_Record_ID, setForm]);
   return null;
 }
 
@@ -81,13 +105,13 @@ export default function EmployeesPage() {
       {key:'Percentage',     label:'Percentage',    required:true, numeric:true, min:0, max:100, section:'Education'},
       // ── Experience ─────────────────────────────────────────────────────────
       {key:'Is_Fresher',        label:'Is fresher',            type:'select', options:[{v:'Y',l:'Yes'},{v:'N',l:'No'}], section:'Experience'},
-      {key:'Prev_Company_Name', label:'Previous company',      required:true, minLen:5, maxLen:30, section:'Experience'},
-      {key:'Industry_Type',     label:'Previous industry name',required:true, minLen:5, maxLen:30, section:'Experience'},
-      {key:'Prev_Department',   label:'Previous department',   required:true, minLen:5, maxLen:30, section:'Experience'},
-      {key:'Prev_Designation',  label:'Previous designation',  required:true, minLen:5, maxLen:30, section:'Experience'},
-      {key:'Total_Experience',  label:'Total experience (yrs)',required:true, numeric:true, min:0, section:'Experience'},
-      {key:'Last_Drawn_Salary', label:'Last drawn salary',     required:true, numeric:true, min:0, section:'Experience'},
-      {key:'Reason_For_Leaving',label:'Reason for leaving',    required:true, section:'Experience'},
+      {key:'Prev_Company_Name', label:'Previous company',      minLen:5, maxLen:30, section:'Experience'},
+      {key:'Industry_Type',     label:'Previous industry name',minLen:5, maxLen:30, section:'Experience'},
+      {key:'Prev_Department',   label:'Previous department',   minLen:5, maxLen:30, section:'Experience'},
+      {key:'Prev_Designation',  label:'Previous designation',  minLen:5, maxLen:30, section:'Experience'},
+      {key:'Total_Experience',  label:'Total experience (yrs)',numeric:true, min:0, section:'Experience'},
+      {key:'Last_Drawn_Salary', label:'Last drawn salary',     numeric:true, min:0, section:'Experience'},
+      {key:'Reason_For_Leaving',label:'Reason for leaving',    section:'Experience'},
       // ── Nominee ────────────────────────────────────────────────────────────
       {key:'Nominee_Name',          label:'Nominee name',         type:'alpha', section:'Nominee'},
       {key:'Nominee_Relationship',  label:'Nominee relationship', type:'select', options:NOMINEE_REL, section:'Nominee'},

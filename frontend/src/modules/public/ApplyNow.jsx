@@ -23,7 +23,7 @@ const SPEC_OPT = ['Computer Science', 'Information Technology', 'Software Engine
 const SOURCE_OPT = [{v:'PORTAL',l:'Job portal'}, {v:'HRMS',l:'Internal HRMS'}, {v:'LINKEDIN',l:'LinkedIn'}, {v:'REFERRAL',l:'Referral'}, {v:'DIRECT',l:'Direct'}, {v:'WEBSITE',l:'Website'}];
 
 const INIT = {
-  First_Name:'', Last_Name:'', Middle_Name:'', Date_of_Birth:'', Gender:'', Marital_Status:'', Nationality:'',
+  company_id:'', First_Name:'', Last_Name:'', Middle_Name:'', Date_of_Birth:'', Gender:'', Marital_Status:'', Nationality:'',
   Email_ID:'', Phone_Number:'', Alternate_Phone:'', Emergency_Contact_Name:'', Emergency_Contact_Number:'',
   Address_Line1:'', Address_Line2:'', City:'', State:'', Country:'', Pincode:'',
   Aadhaar_Number:'', PAN_Number:'', Aadhaar_File:'', PAN_File:'', Photo_File:'', Other_Doc_File:'',
@@ -37,6 +37,7 @@ const INIT = {
 function validateStep(step, form) {
   const e = {};
   if (step === 0) {
+    if (!form.company_id) e.company_id = 'Required';
     if (!RE.name.test(form.First_Name)) e.First_Name = 'Required, 2–50 letters';
     if (!RE.name.test(form.Last_Name)) e.Last_Name = 'Required, 2–50 letters';
     if (form.Middle_Name && !/^[a-zA-Z\s]{0,50}$/.test(form.Middle_Name)) e.Middle_Name = 'Max 50 letters';
@@ -188,10 +189,15 @@ export default function ApplyNow() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [jobPostings, setJobPostings] = useState([]);
+  const [companies, setCompanies] = useState([]);
 
   useEffect(() => {
-    axios.get((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/public/job-postings')
+    const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/public';
+    axios.get(apiBase + '/job-postings')
       .then(res => setJobPostings((res.data?.data || res.data || []).map(j => ({ v: j.id, l: j.Posting_Title }))))
+      .catch(() => {});
+    axios.get(apiBase + '/companies')
+      .then(res => setCompanies((res.data?.data || res.data || []).map(c => ({ v: c.id, l: c.Company_Name }))))
       .catch(() => {});
   }, []);
 
@@ -225,6 +231,7 @@ export default function ApplyNow() {
     <div>
       <div style={S.sh2}>{icons[0]} Personal Information</div>
       <div style={S.grid}>
+        <div style={{gridColumn:'1/-1'}}><Sel f={f} k='company_id' label='Company *' opts={companies}/></div>
         <Inp f={f} k='First_Name' label='First Name *'/>
         <Inp f={f} k='Middle_Name' label='Middle Name'/>
         <Inp f={f} k='Last_Name' label='Last Name *'/>
