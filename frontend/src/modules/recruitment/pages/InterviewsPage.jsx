@@ -1,7 +1,7 @@
 
 import React from 'react';
 import GenericModule from '../../GenericModule';
-const ROUND = [{v:1,l:'1'},{v:2,l:'2'},{v:3,l:'3'},{v:4,l:'4'},{v:5,l:'5'},{v:6,l:'6'},{v:7,l:'7'},{v:8,l:'8'},{v:9,l:'9'},{v:10,l:'10'}];
+const ROUND = [{v:1,l:'1'},{v:2,l:'2'},{v:3,l:'3'}];
 const RATING = [{v:1,l:'1'},{v:2,l:'2'},{v:3,l:'3'},{v:4,l:'4'},{v:5,l:'5'}];
 // Interview date: future dates only; time defaults 00:00; Status: Scheduled/Completed/Cancelled
 const tomorrow = () => { const d = new Date(); d.setDate(d.getDate()+1); return d.toISOString().split('T')[0]; };
