@@ -2,9 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import api, { crudOf } from '../../../utils/api';
 import { useAuth } from '../../../context/AuthContext';
-import { Modal, LOV, Badge, DataTable, Pagination, TblHeader, ViewModal, AuditSection, ContextSection, Spin, Field } from '../../../components/UI';
+import { Modal, LOV, DataTable, Pagination, TblHeader, ViewModal, AuditSection, ContextSection, Spin } from '../../../components/UI';
 
-const RATING_OPTS = [{v:0,l:'0'},{v:1,l:'1'},{v:2,l:'2'},{v:3,l:'3'},{v:4,l:'4'},{v:5,l:'5'}];
+const rangeOptions = (min, max) => {
+  const lo = Number.isNaN(parseFloat(min)) ? 0 : parseInt(min, 10);
+  const hi = Number.isNaN(parseFloat(max)) ? 10 : parseInt(max, 10);
+  if (hi < lo) return [];
+  return Array.from({ length: hi - lo + 1 }, (_, i) => {
+    const value = lo + i;
+    return { v: value, l: String(value) };
+  });
+};
 
 export default function AppraisalRatingsPage() {
   const { user } = useAuth();
@@ -17,64 +25,83 @@ export default function AppraisalRatingsPage() {
   const [form, setForm] = useState({});
   const [errors, setErrors] = useState({});
   const [lovData, setLovData] = useState({});
-  const [eaData, setEaData] = useState(null); // selected employee appraisal data
+  const [eaData, setEaData] = useState(null);
   const [hrRatings, setHrRatings] = useState({});
   const crud = crudOf('appraisal-ratings');
 
   useEffect(() => {
-    Promise.all(['companies','business-types','business-groups','modules','employee-appraisals','appraisals'].map(ep =>
-      api.get('/'+ep,{params:{limit:500}}).then(r=>({ep,data:r.data||[]})).catch(()=>({ep,data:[]}))
-    )).then(rs => { const m={}; rs.forEach(r=>m[r.ep]=r.data); setLovData(m); });
+    Promise.all(['companies', 'business-types', 'business-groups', 'modules', 'employee-appraisals', 'appraisals'].map(ep =>
+      api.get('/' + ep, { params: { limit: 500 } }).then(r => ({ ep, data: r.data || [] })).catch(() => ({ ep, data: [] }))
+    )).then(rs => { const m = {}; rs.forEach(r => m[r.ep] = r.data); setLovData(m); });
   }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
-    try { const r = await crud.list({page,limit:perPage,q:search||undefined}); setData(r.data||[]); setTotal(r.total||0); setPages(r.pages||1); }
-    catch(e){ toast.error(e.message); } finally { setLoading(false); }
-  }, [page,perPage,search]);
-  useEffect(()=>{ load(); },[load]);
+    try { const r = await crud.list({ page, limit: perPage, q: search || undefined }); setData(r.data || []); setTotal(r.total || 0); setPages(r.pages || 1); }
+    catch (e) { toast.error(e.message); } finally { setLoading(false); }
+  }, [page, perPage, search]);
+  useEffect(() => { load(); }, [load]);
 
-  const loadEA = async (eaId) => {
+  const loadEA = async eaId => {
     if (!eaId) { setEaData(null); setHrRatings({}); return; }
     try {
-      const ea = (lovData['employee-appraisals']||[]).find(e=>e.id===eaId);
+      const ea = (lovData['employee-appraisals'] || []).find(e => e.id === eaId);
       if (ea && ea.key_area_ratings) {
         setEaData(ea);
         const init = {};
-        Object.keys(ea.key_area_ratings||{}).forEach(kid=>{ init[kid]={hr_rating:'',hr_comments:''}; });
+        Object.entries(ea.key_area_ratings || {}).forEach(([kid, value]) => {
+          init[kid] = {
+            hr_rating: '',
+            hr_comments: '',
+            minimum_rating: value.minimum_rating,
+            maximum_rating: value.maximum_rating,
+          };
+        });
         setHrRatings(init);
       }
-    } catch(e){ setEaData(null); }
+    } catch (e) { setEaData(null); }
   };
 
   const handleChange = e => {
-    const {name,value}=e.target;
-    setForm(p=>({...p,[name]:value}));
-    if (name==='HRMS_employee_appraisal_id') loadEA(value);
-    if(errors[name]) setErrors(p=>({...p,[name]:''}));
+    const { name, value } = e.target;
+    setForm(p => ({ ...p, [name]: value }));
+    if (name === 'HRMS_employee_appraisal_id') loadEA(value);
+    if (errors[name]) setErrors(p => ({ ...p, [name]: '' }));
   };
 
-  const handleHrRating = (kid, field, value) => setHrRatings(p=>({...p,[kid]:{...p[kid],[field]:value}}));
+  const handleHrRating = (kid, field, value) => setHrRatings(p => ({ ...p, [kid]: { ...p[kid], [field]: value } }));
 
-  // Compute averages
+  const getHrRatingError = (kid, ka) => {
+    const raw = hrRatings[kid]?.hr_rating;
+    if (raw === '' || raw == null) return 'HR rating is required';
+    const num = parseFloat(raw);
+    const min = parseFloat(ka.minimum_rating ?? 0);
+    const max = parseFloat(ka.maximum_rating ?? 10);
+    if (Number.isNaN(num)) return 'Please select a valid HR rating';
+    if (num < min || num > max) return `HR Rating must be between ${min} and ${max}`;
+    return '';
+  };
+
   const kaEntries = eaData?.key_area_ratings ? Object.entries(eaData.key_area_ratings) : [];
-  const avgSelf = kaEntries.length>0 ? (kaEntries.reduce((s,[,v])=>s+parseFloat(v.self_rating||0),0)/kaEntries.length).toFixed(2) : '—';
-  const hrVals = Object.values(hrRatings).map(v=>parseFloat(v.hr_rating)).filter(v=>!isNaN(v));
-  const avgHr = hrVals.length>0 ? (hrVals.reduce((a,b)=>a+b,0)/hrVals.length).toFixed(2) : '—';
+  const avgSelf = kaEntries.length > 0 ? (kaEntries.reduce((s, [, v]) => s + parseFloat(v.self_rating || 0), 0) / kaEntries.length).toFixed(2) : '-';
+  const hrVals = kaEntries
+    .map(([kid, ka]) => getHrRatingError(kid, ka) ? NaN : parseFloat(hrRatings[kid]?.hr_rating))
+    .filter(v => !Number.isNaN(v));
+  const avgHr = hrVals.length > 0 ? (hrVals.reduce((a, b) => a + b, 0) / hrVals.length).toFixed(2) : '-';
 
   const validate = () => {
     const errs = {};
-    if (!form.company_id) errs.company_id='Please select the Company';
-    if (!form.Business_Type_ID) errs.Business_Type_ID='Business type is required';
-    if (!form.business_group_id) errs.business_group_id='Business group is required';
-    if (!form.module_id) errs.module_id='Please select Module';
-    if (!form.effective_from) errs.effective_from='Effective from is required';
-    if (!form.HRMS_employee_appraisal_id) errs.HRMS_employee_appraisal_id='Employee appraisal is required';
-    if (kaEntries.length>0) {
-      const inc = kaEntries.filter(([kid])=>!hrRatings[kid]?.hr_rating&&hrRatings[kid]?.hr_rating!==0||!hrRatings[kid]?.hr_comments);
-      if (inc.length>0) errs._hr='Please complete HR/Supervisor Rating and Comments for all Key Areas.';
+    if (!form.company_id) errs.company_id = 'Please select the Company';
+    if (!form.Business_Type_ID) errs.Business_Type_ID = 'Business type is required';
+    if (!form.business_group_id) errs.business_group_id = 'Business group is required';
+    if (!form.module_id) errs.module_id = 'Please select Module';
+    if (!form.effective_from) errs.effective_from = 'Effective from is required';
+    if (!form.HRMS_employee_appraisal_id) errs.HRMS_employee_appraisal_id = 'Employee appraisal is required';
+    if (kaEntries.length > 0) {
+      const invalid = kaEntries.filter(([kid, ka]) => getHrRatingError(kid, ka) || !hrRatings[kid]?.hr_comments);
+      if (invalid.length > 0) errs._hr = 'Please complete valid HR Ratings and Comments for all Key Areas.';
     }
-    setErrors(errs); return Object.keys(errs).length===0;
+    setErrors(errs); return Object.keys(errs).length === 0;
   };
 
   const save = async () => {
@@ -82,79 +109,84 @@ export default function AppraisalRatingsPage() {
     if (editing && !window.confirm('Update this appraisal rating?')) return;
     setLoading(true);
     try {
-      const body={...form,hr_ratings:hrRatings,avg_self_rating:avgSelf,avg_hr_rating:avgHr,updated_by:user?.username||''};
-      if(editing) await crud.update(editing.id,body); else await crud.create(body);
+      const body = { ...form, hr_ratings: hrRatings, avg_self_rating: avgSelf, avg_hr_rating: avgHr, updated_by: user?.username || '' };
+      if (editing) await crud.update(editing.id, body); else await crud.create(body);
       toast.success('Appraisal rating saved!'); setModal(false); load();
-    } catch(e){ toast.error(e.message); } finally { setLoading(false); }
+    } catch (e) { toast.error(e.message); } finally { setLoading(false); }
   };
 
-  const cols=[
-    {key:'HRMS_employee_appraisal_id',label:'Employee appraisal',render:(_,r)=>r._eaRef||r.HRMS_employee_appraisal_id||'—'},
-    {key:'avg_self_rating',label:'Avg self rating'},
-    {key:'avg_hr_rating',label:'Avg HR rating'},
+  const cols = [
+    { key: 'HRMS_employee_appraisal_id', label: 'Employee appraisal', render: (_, r) => r._eaRef || r.HRMS_employee_appraisal_id || '-' },
+    { key: 'avg_self_rating', label: 'Avg self rating' },
+    { key: 'avg_hr_rating', label: 'Avg HR rating' },
   ];
 
   return (
     <div>
       <div className="card">
         <TblHeader title="Appraisal ratings" search={search} onSearch={setSearch}
-          onAdd={()=>{setForm({active_flag:'Y',effective_from:new Date().toISOString().split('T')[0]});setEditing(null);setEaData(null);setHrRatings({});setModal(true);}}
-          addLabel="Add appraisal rating"/>
+          onAdd={() => { setForm({ active_flag: 'Y', effective_from: new Date().toISOString().split('T')[0] }); setEditing(null); setEaData(null); setHrRatings({}); setModal(true); }}
+          addLabel="Add appraisal rating" />
         <DataTable cols={cols} data={data} loading={loading}
-          onEdit={r=>{setForm({active_flag:'Y',effective_from:new Date().toISOString().split('T')[0],...r});setEditing(r);loadEA(r.HRMS_employee_appraisal_id);setModal(true);}}
-          onDelete={async id=>{if(!window.confirm('Delete?'))return;await crud.remove(id);load();}}
-          onView={r=>setViewing(r)}
-          onToggleStatus={async(id,isActive)=>{if(isActive&&!window.confirm('Deactivate?'))return;await crud.toggle(id);load();}}/>
-        <Pagination page={page} pages={pages} total={total} perPage={perPage} setPage={setPage} setPerPage={setPerPage}/>
+          onEdit={r => { setForm({ active_flag: 'Y', effective_from: new Date().toISOString().split('T')[0], ...r }); setEditing(r); loadEA(r.HRMS_employee_appraisal_id); setModal(true); }}
+          onDelete={async id => { if (!window.confirm('Delete?')) return; await crud.remove(id); load(); }}
+          onView={r => setViewing(r)}
+          onToggleStatus={async (id, isActive) => { if (isActive && !window.confirm('Deactivate?')) return; await crud.toggle(id); load(); }} />
+        <Pagination page={page} pages={pages} total={total} perPage={perPage} setPage={setPage} setPerPage={setPerPage} />
       </div>
-      <ViewModal open={!!viewing} onClose={()=>setViewing(null)} title="Appraisal rating" record={viewing} cols={cols}/>
-      <Modal open={modal} onClose={()=>{setModal(false);setEditing(null);}} title={`${editing?'Edit':'Add'} appraisal rating`} size="2xl"
+      <ViewModal open={!!viewing} onClose={() => setViewing(null)} title="Appraisal rating" record={viewing} cols={cols} />
+      <Modal open={modal} onClose={() => { setModal(false); setEditing(null); }} title={`${editing ? 'Edit' : 'Add'} appraisal rating`} size="2xl"
         footer={<>
-          <button onClick={()=>{setModal(false);setEditing(null);}} className="btn-outline btn">Cancel</button>
-          <button onClick={save} disabled={loading} className="btn-primary btn">{loading?<Spin size={4}/>:null} {editing?'Update':'Save rating'}</button>
+          <button onClick={() => { setModal(false); setEditing(null); }} className="btn-outline btn">Cancel</button>
+          <button onClick={save} disabled={loading} className="btn-primary btn">{loading ? <Spin size={4} /> : null} {editing ? 'Update' : 'Save rating'}</button>
         </>}>
         <ContextSection form={form} onChange={handleChange}
-          companies={lovData['companies']||[]} businessTypes={lovData['business-types']||[]}
-          businessGroups={lovData['business-groups']||[]} modules={lovData['modules']||[]} errors={errors}/>
+          companies={lovData['companies'] || []} businessTypes={lovData['business-types'] || []}
+          businessGroups={lovData['business-groups'] || []} modules={lovData['modules'] || []} errors={errors} />
         <div className="fsec">
-          <p className="fsec-title">📝 Select employee appraisal</p>
-          <LOV label="Employee appraisal" name="HRMS_employee_appraisal_id" value={form.HRMS_employee_appraisal_id||''}
+          <p className="fsec-title">Select employee appraisal</p>
+          <LOV label="Employee appraisal" name="HRMS_employee_appraisal_id" value={form.HRMS_employee_appraisal_id || ''}
             onChange={handleChange} error={errors.HRMS_employee_appraisal_id} required
-            options={lovData['employee-appraisals']||[]}
-            labelFn={o=>{const n=o._empName||''; return n?`${n} – ${o.review_period||o.HRMS_appraisal_id||''}`:o._displayId||o.id;}}
-            tooltip="Shows Employee Name + Appraisal Period — not EA1"/>
+            options={lovData['employee-appraisals'] || []}
+            labelFn={o => { const n = o._empName || ''; return n ? `${n} - ${o.review_period || o.HRMS_appraisal_id || ''}` : o._displayId || o.id; }}
+            tooltip="Shows Employee Name + Appraisal Period" />
         </div>
-        {kaEntries.length>0 && (
+        {kaEntries.length > 0 && (
           <div className="fsec">
-            <p className="fsec-title">⭐ Key areas — HR/Supervisor rating</p>
-            {errors._hr && <p className="err-msg mb-2">⚠ {errors._hr}</p>}
+            <p className="fsec-title">Key areas - HR/Supervisor rating</p>
+            {errors._hr && <p className="err-msg mb-2">Warning {errors._hr}</p>}
             <div className="overflow-x-auto">
               <table className="tbl">
                 <thead className="thead"><tr>
                   <th className="th">Key area</th>
                   <th className="th">Self rating</th>
                   <th className="th">Self description</th>
-                  <th className="th w-32">HR rating (0–5) *</th>
+                  <th className="th w-40">HR rating *</th>
                   <th className="th">HR comments *</th>
                 </tr></thead>
                 <tbody>
-                  {kaEntries.map(([kid,ka])=>(
-                    <tr key={kid} className="tr">
-                      <td className="td font-medium">{ka.key_area_name||kid}</td>
-                      <td className="td text-center">{ka.self_rating??'—'}</td>
-                      <td className="td text-sm text-gray-600">{ka.description||'—'}</td>
-                      <td className="td">
-                        <select className="input w-20" value={hrRatings[kid]?.hr_rating??''} onChange={e=>handleHrRating(kid,'hr_rating',e.target.value)}>
-                          <option value="">—</option>
-                          {RATING_OPTS.map(o=><option key={o.v} value={o.v}>{o.l}</option>)}
-                        </select>
-                      </td>
-                      <td className="td">
-                        <textarea className="input text-xs" rows={2} placeholder="HR comments (mandatory)"
-                          value={hrRatings[kid]?.hr_comments||''} onChange={e=>handleHrRating(kid,'hr_comments',e.target.value)}/>
-                      </td>
-                    </tr>
-                  ))}
+                  {kaEntries.map(([kid, ka]) => {
+                    const options = rangeOptions(ka.minimum_rating, ka.maximum_rating);
+                    const hrError = getHrRatingError(kid, ka);
+                    return (
+                      <tr key={kid} className="tr">
+                        <td className="td font-medium">{ka.key_area_name || kid}</td>
+                        <td className="td text-center">{ka.self_rating ?? '-'}</td>
+                        <td className="td text-sm text-gray-600">{ka.description || '-'}</td>
+                        <td className="td">
+                          <select className={`input w-28 ${hrError ? 'input-err' : ''}`} value={hrRatings[kid]?.hr_rating ?? ''} onChange={e => handleHrRating(kid, 'hr_rating', e.target.value)}>
+                            <option value="">Select</option>
+                            {options.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
+                          </select>
+                          {hrError && <p className="err-msg mt-1">{hrError}</p>}
+                        </td>
+                        <td className="td">
+                          <textarea className="input text-xs" rows={2} placeholder="HR comments (mandatory)"
+                            value={hrRatings[kid]?.hr_comments || ''} onChange={e => handleHrRating(kid, 'hr_comments', e.target.value)} />
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -170,7 +202,7 @@ export default function AppraisalRatingsPage() {
             </div>
           </div>
         )}
-        <AuditSection form={form} onChange={handleChange} user={user}/>
+        <AuditSection form={form} onChange={handleChange} user={user} />
       </Modal>
     </div>
   );

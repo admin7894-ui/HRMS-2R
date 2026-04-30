@@ -38,6 +38,11 @@ const employeeName = id => {
   return emp ? `${emp.First_Name} ${emp.Last_Name}`.trim() : null;
 };
 
+const absenceTypeName = id => {
+  const absenceType = (db.absence_types || []).find(t => t.id === id);
+  return absenceType?.absence_name || null;
+};
+
 const departmentName = id => {
   const dept = (db.departments || []).find(d => d.id === id);
   return dept?.Department_Name || null;
@@ -371,7 +376,9 @@ const asgCtrl = makeController('assignments', ['assignment_type']);
 r.get('/assignments', (req, res) => {
   try {
     let all = db.assignments || [];
+    const employeeFilter = req.query.employee_id || req.query.HRMS_employee_id;
     if (req.query.q) { const lq=req.query.q.toLowerCase(); all=all.filter(x=>String(x.assignment_type??'').toLowerCase().includes(lq)); }
+    if (employeeFilter) all = all.filter(x => String(x.HRMS_employee_id) === String(employeeFilter));
     const skip = new Set(['q','page','limit','sortBy','sortOrder']);
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k)&&v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
@@ -437,12 +444,104 @@ r.post('/absences', absCtrl.create);
 r.put('/absences/:id', absCtrl.update);
 r.delete('/absences/:id', absCtrl.remove);
 r.patch('/absences/:id/toggle-status', absCtrl.toggleStatus);
-wire('leave-balances',       'leave_balances',       ['HRMS_employee_id']);
+const lbCtrl = makeController('leave_balances', ['HRMS_employee_id']);
+r.get('/leave-balances', listWith('leave_balances', ['HRMS_employee_id'], x => {
+  const Employee_Name = employeeName(x.HRMS_employee_id);
+  const Absence_Type_Name = absenceTypeName(x.HRMS_absence_type_id);
+  return { ...x, Employee_Name, Absence_Type_Name, _empName: Employee_Name, _absenceTypeName: Absence_Type_Name };
+}));
+r.get('/leave-balances/:id', lbCtrl.get);
+r.post('/leave-balances', lbCtrl.create);
+r.put('/leave-balances/:id', lbCtrl.update);
+r.delete('/leave-balances/:id', lbCtrl.remove);
+r.patch('/leave-balances/:id/toggle-status', lbCtrl.toggleStatus);
 wire('appraisal-cycles',     'appraisal_cycles',     ['cycle_name']);
-wire('appraisals',           'appraisals',           ['appraisal_status', 'review_period']);
+const apprCtrl = makeController('appraisals', ['appraisal_status', 'review_period']);
+r.get('/appraisals', listWith('appraisals', ['appraisal_status', 'review_period'], x => {
+  const Employee_Name = employeeName(x.HRMS_employee_id);
+  const cycle = (db.appraisal_cycles || []).find(c => c.id === x.HRMS_appraisal_cycle_id);
+  return {
+    ...x,
+    Employee_Name,
+    cycle_name: cycle?.cycle_name || null,
+    _empName: Employee_Name,
+  };
+}));
+r.get('/appraisals/:id', apprCtrl.get);
+r.post('/appraisals', apprCtrl.create);
+r.put('/appraisals/:id', apprCtrl.update);
+r.delete('/appraisals/:id', apprCtrl.remove);
+r.patch('/appraisals/:id/toggle-status', apprCtrl.toggleStatus);
 wire('appraisal-key-areas',  'appraisal_key_areas',  ['key_area_name']);
-wire('employee-appraisals',  'employee_appraisals',  ['appraisal_status']);
-wire('appraisal-ratings',    'appraisal_ratings',    ['key_area_name']);
+const eaCtrl = makeController('employee_appraisals', ['appraisal_status']);
+r.get('/employee-appraisals', listWith('employee_appraisals', ['appraisal_status'], x => {
+  const Employee_Name = employeeName(x.HRMS_employee_id);
+  const cycle = (db.appraisal_cycles || []).find(c => c.id === x.HRMS_appraisal_cycle_id);
+  const appraisal = (db.appraisals || []).find(a => a.id === x.HRMS_appraisal_id);
+  const cycleName = cycle?.cycle_name || null;
+  const appraisalRef = appraisal?.review_period || appraisal?._displayId || x.HRMS_appraisal_id || null;
+  return {
+    ...x,
+    Employee_Name,
+    cycle_name: cycleName,
+    review_period: x.review_period || cycleName || appraisalRef,
+    _empName: Employee_Name,
+    _cycleName: cycleName,
+    _appraisalRef: cycleName || appraisalRef,
+  };
+}));
+r.get('/employee-appraisals/:id', eaCtrl.get);
+r.post('/employee-appraisals', eaCtrl.create);
+r.put('/employee-appraisals/:id', eaCtrl.update);
+r.delete('/employee-appraisals/:id', eaCtrl.remove);
+r.patch('/employee-appraisals/:id/toggle-status', eaCtrl.toggleStatus);
+const arCtrl = makeController('appraisal_ratings', ['key_area_name']);
+r.get('/appraisal-ratings', (req, res) => {
+  try {
+    let all = db.appraisal_ratings || [];
+    const employeeFilter = req.query.employee_id;
+    const cycleFilter = req.query.appraisal_cycle_id;
+    if (req.query.q) {
+      const lq = req.query.q.toLowerCase();
+      all = all.filter(x => String(x.key_area_name ?? '').toLowerCase().includes(lq));
+    }
+    const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder', 'employee_id', 'appraisal_cycle_id']);
+    Object.entries(req.query).forEach(([k, v]) => {
+      if (!skip.has(k) && v) {
+        const vals = Array.isArray(v) ? v : [v];
+        all = all.filter(x => vals.some(vv => String(x[k] ?? '').toLowerCase() === vv.toLowerCase()));
+      }
+    });
+    all = all.map(x => {
+      const ea = (db.employee_appraisals || []).find(e => e.id === x.HRMS_employee_appraisal_id);
+      const Employee_Name = employeeName(ea?.HRMS_employee_id);
+      const cycle = (db.appraisal_cycles || []).find(c => c.id === ea?.HRMS_appraisal_cycle_id);
+      return {
+        ...x,
+        employee_id: ea?.HRMS_employee_id || null,
+        appraisal_cycle_id: ea?.HRMS_appraisal_cycle_id || null,
+        Employee_Name,
+        cycle_name: cycle?.cycle_name || null,
+        _eaRef: Employee_Name && (cycle?.cycle_name || ea?.review_period)
+          ? `${Employee_Name} - ${cycle?.cycle_name || ea?.review_period}`
+          : x.HRMS_employee_appraisal_id,
+      };
+    });
+    if (employeeFilter) all = all.filter(x => String(x.employee_id) === String(employeeFilter));
+    if (cycleFilter) all = all.filter(x => String(x.appraisal_cycle_id) === String(cycleFilter));
+    if (req.query.sortBy) {
+      const dir = req.query.sortOrder === 'desc' ? -1 : 1;
+      all = [...all].sort((a, b) => String(a[req.query.sortBy] ?? '').localeCompare(String(b[req.query.sortBy] ?? ''), undefined, { numeric: true }) * dir);
+    }
+    const pg = Math.max(1, +req.query.page || 1), lim = Math.min(200, +req.query.limit || 10);
+    res.json({ success: true, data: all.slice((pg - 1) * lim, pg * lim), total: all.length, page: pg, limit: lim, pages: Math.ceil(all.length / lim) });
+  } catch (e) { err(res, e.message, 500); }
+});
+r.get('/appraisal-ratings/:id', arCtrl.get);
+r.post('/appraisal-ratings', arCtrl.create);
+r.put('/appraisal-ratings/:id', arCtrl.update);
+r.delete('/appraisal-ratings/:id', arCtrl.remove);
+r.patch('/appraisal-ratings/:id/toggle-status', arCtrl.toggleStatus);
 wire('competences',          'competences',          ['competence_name', 'competence_code'], 'competence_code', 'competence_name');
 const ecCtrl = makeController('employee_competences', ['competence_type']);
 r.get('/employee-competences', (req, res) => {

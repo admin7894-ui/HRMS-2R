@@ -162,8 +162,9 @@ enrollments:[
   {id:'EN1',HRMS_enrollment_id:'HRMS_ENR_001',company_id:'C1',business_group_id:'BG1',business_type_id:'BT1',module_id:'MOD1',HRMS_employee_id:'E1',HRMS_program_id:'PR1',enrollment_date:'2024-02-01',completion_date:'2024-03-15',completion_status:'COMPLETED',score:88,certificate_issued:'true',...a()},
 ],
 assignments:[
-  {id:'ASN1',HRMS_assignment_id:'HRMS_ASG_001',company_id:'C1',business_group_id:'BG1',business_type_id:'BT1',module_id:'MOD1',HRMS_employee_id:'E1',HRMS_department_id:'D1',HRMS_position_id:'P1',HRMS_grade_id:'G1',HRMS_status_type_id:'AS1',assignment_type:'PERMANENT',inventory_unit:'IT_UNIT_01',...a()},
-  {id:'ASN2',HRMS_assignment_id:'HRMS_ASG_002',company_id:'C1',business_group_id:'BG1',business_type_id:'BT1',module_id:'MOD1',HRMS_employee_id:'E2',HRMS_department_id:'D2',HRMS_position_id:'P3',HRMS_grade_id:'G4',HRMS_status_type_id:'AS1',assignment_type:'PERMANENT',inventory_unit:'HR_UNIT_01',...a()},
+  {id:'ASN1',HRMS_assignment_id:'HRMS_ASG_001',company_id:'C1',business_group_id:'BG1',business_type_id:'BT1',module_id:'MOD1',HRMS_employee_id:'E1',HRMS_department_id:'D1',HRMS_position_id:'P1',HRMS_grade_id:'G1',HRMS_work_schedule_id:'WS1',HRMS_status_type_id:'AS1',assignment_type:'PERMANENT',inventory_unit:'IT_UNIT_01',...a()},
+  {id:'ASN2',HRMS_assignment_id:'HRMS_ASG_002',company_id:'C1',business_group_id:'BG1',business_type_id:'BT1',module_id:'MOD1',HRMS_employee_id:'E2',HRMS_department_id:'D2',HRMS_position_id:'P3',HRMS_grade_id:'G4',HRMS_work_schedule_id:'WS1',HRMS_status_type_id:'AS1',assignment_type:'PERMANENT',inventory_unit:'HR_UNIT_01',...a()},
+  {id:'ASN3',HRMS_assignment_id:'HRMS_ASG_003',company_id:'C1',business_group_id:'BG2',business_type_id:'BT3',module_id:'MOD1',HRMS_employee_id:'E3',HRMS_department_id:'D1',HRMS_position_id:'P1',HRMS_grade_id:'G1',HRMS_work_schedule_id:'WS2',HRMS_status_type_id:'AS1',assignment_type:'PERMANENT',inventory_unit:'FIN_UNIT_01',...a()},
 ],
 supervisors:[
   {id:'SUP1',HRMS_supervisor_id:'HRMS_SUP_001',company_id:'C1',business_group_id:'BG1',business_type_id:'BT1',module_id:'MOD1',HRMS_employee_id:'E1',HRMS_assignment_id:'ASN1',supervisor_employee_id:'E2',supervisor_assignment_id:'ASN2',...a()},

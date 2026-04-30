@@ -5,10 +5,49 @@ const { genId } = require('../utils/idGen');
 const { makeController } = require('./base.controller');
 
 const base = makeController('time_cards', ['HRMS_employee_id', 'attendance_status']);
-exports.list = base.list;
 exports.get = base.get;
 exports.remove = base.remove;
 exports.toggleStatus = base.toggleStatus;
+
+const employeeName = id => {
+  const emp = (db.employees || []).find(e => e.id === id);
+  return emp ? `${emp.First_Name} ${emp.Last_Name}`.trim() : null;
+};
+
+exports.list = (req, res) => {
+  try {
+    let all = db.time_cards || [];
+    if (req.query.q) {
+      const lq = req.query.q.toLowerCase();
+      all = all.filter(x => ['HRMS_employee_id', 'attendance_status'].some(f => String(x[f] ?? '').toLowerCase().includes(lq)));
+    }
+    const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder']);
+    Object.entries(req.query).forEach(([k, v]) => {
+      if (!skip.has(k) && v) {
+        const vals = Array.isArray(v) ? v : [v];
+        all = all.filter(x => vals.some(vv => String(x[k] ?? '').toLowerCase() === vv.toLowerCase()));
+      }
+    });
+    if (req.query.sortBy) {
+      const dir = req.query.sortOrder === 'desc' ? -1 : 1;
+      all = [...all].sort((a, b) => String(a[req.query.sortBy] ?? '').localeCompare(String(b[req.query.sortBy] ?? ''), undefined, { numeric: true }) * dir);
+    }
+    all = all.map(x => {
+      const Employee_Name = employeeName(x.HRMS_employee_id);
+      return { ...x, Employee_Name, _empName: Employee_Name };
+    });
+    const page = Math.max(1, +req.query.page || 1);
+    const limit = Math.min(200, +req.query.limit || 10);
+    res.json({
+      success: true,
+      data: all.slice((page - 1) * limit, page * limit),
+      total: all.length,
+      page,
+      limit,
+      pages: Math.ceil(all.length / limit),
+    });
+  } catch(e) { err(res, e.message, 500); }
+};
 
 const parseTime = t => { if (!t) return null; const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 

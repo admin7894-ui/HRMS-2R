@@ -12,6 +12,7 @@ const GenericModule = ({
   title, endpoint, columns, fields,
   defaultForm = {}, filterCols = [],
   extraForm,
+  customValidate,
 }) => {
   const { user } = useAuth();
   const [data, setData] = useState([]);
@@ -166,6 +167,9 @@ const GenericModule = ({
           errs[f.key] = 'Account number must be 10–18 digits';
       }
     });
+    if (typeof customValidate === 'function') {
+      Object.assign(errs, customValidate(candidate) || {});
+    }
     setErrors(errs);
     if (Object.keys(errs).length > 0) {
       setTimeout(() => {
@@ -237,7 +241,8 @@ const GenericModule = ({
     if (f.type === 'lov') return (
       <LOV key={f.key} label={f.label} name={f.key} value={val} onChange={handleChange}
         error={er} required={f.required} tooltip={f.tooltip}
-        options={lovData[f.lovEndpoint] || []} valueKey={f.valueKey || 'id'} labelFn={f.labelFn}/>
+        options={lovData[f.lovEndpoint] || []} valueKey={f.valueKey || 'id'} labelFn={f.labelFn}
+        disabled={f.readOnly}/>
     );
     if (f.type === 'searchable-lov') return (
       <SearchableLOV key={f.key} label={f.label} name={f.key} value={val} onChange={handleChange}
