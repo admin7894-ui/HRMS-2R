@@ -4,7 +4,7 @@ export default function SeparationsPage() {
   return <GenericModule title="Separations" endpoint="separations"
     filterCols={[{key:'separation_type',label:'Type'},{key:'separation_status',label:'Status'}]}
     columns={[
-      {key:'HRMS_employee_id',label:'Employee name',render:(_,r)=>r._empName||r.HRMS_employee_id||'—'},
+      {key:'HRMS_employee_id',label:'Employee name',render:(_,r)=>r.Employee_Name||r._empName||r.HRMS_employee_id||'—'},
       {key:'separation_type',label:'Separation type',type:'badge'},
       {key:'last_working_date',label:'Last working date',type:'date'},
       {key:'separation_status',label:'Status',type:'badge'},

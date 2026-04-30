@@ -12,7 +12,7 @@ export default function AbsenceTypesPage() {
     ]}
     fields={[
       {key:'absence_name',label:'Absence name',required:true,type:'alpha',minLen:3,maxLen:15,generatesCode:true,codeKey:'absence_code',tooltip:'Alphabets only. Code auto-generates from name.'},
-      {key:'absence_code',label:'Absence code',required:true,type:'code',help:'Auto-generated from absence name'},
+      {key:'absence_code',label:'Absence code',required:false,type:'code',help:'Auto-generated from absence name'},
       {key:'entitlement_per_year',label:'Entitlement per year (days)',required:true,numeric:true,min:1,max:365,tooltip:'Enter number of days (max 365). NOT months.'},
       {key:'carry_forward_flag',label:'Carry forward',required:true,type:'select',options:[{v:'true',l:'Yes'},{v:'false',l:'No'}]},
       {key:'max_carry_days',label:'Max carry days (0–5)',required:true,type:'select',options:MAX_CARRY},

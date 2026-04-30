@@ -7,8 +7,8 @@ export default function BenefitEnrollmentsPage() {
   return <GenericModule title="Benefit enrollments" endpoint="benefit-enrollments"
     filterCols={[{key:'enrollment_status',label:'Status'}]}
     columns={[
-      {key:'HRMS_employee_id',label:'Employee name',render:(_,r)=>r._empName||r.HRMS_employee_id||'—'},
-      {key:'HRMS_benefit_plan_id',label:'Benefit plan',render:(_,r)=>r._planName||r.HRMS_benefit_plan_id||'—'},
+      {key:'HRMS_employee_id',label:'Employee name',render:(_,r)=>r.Employee_Name||r._empName||r.HRMS_employee_id||'—'},
+      {key:'HRMS_benefit_plan_id',label:'Benefit plan',render:(_,r)=>r.Benefit_Plan_Name||r._planName||r.HRMS_benefit_plan_id||'—'},
       {key:'nominee_name',label:'Nominee name'},
       {key:'enrollment_status',label:'Status',type:'badge'},
     ]}

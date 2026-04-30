@@ -6,7 +6,37 @@ const { makeController, paginate } = require('./base.controller');
 
 const base = makeController('overtimes', ['HRMS_employee_id', 'approval_status']);
 
-exports.list = base.list;
+const empName = id => {
+  const emp = db.employees?.find(e => e.id === id);
+  return emp ? `${emp.First_Name} ${emp.Last_Name}`.trim() : null;
+};
+
+exports.list = (req, res) => {
+  try {
+    let all = db.overtimes || [];
+    if (req.query.q) {
+      const lq = req.query.q.toLowerCase();
+      all = all.filter(x => ['HRMS_employee_id', 'approval_status'].some(f => String(x[f] ?? '').toLowerCase().includes(lq)));
+    }
+    const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder']);
+    Object.entries(req.query).forEach(([k, v]) => {
+      if (!skip.has(k) && v) {
+        const vals = Array.isArray(v) ? v : [v];
+        all = all.filter(x => vals.some(vv => String(x[k] ?? '').toLowerCase() === vv.toLowerCase()));
+      }
+    });
+    if (req.query.sortBy) {
+      const dir = req.query.sortOrder === 'desc' ? -1 : 1;
+      all = [...all].sort((a, b) => String(a[req.query.sortBy] ?? '').localeCompare(String(b[req.query.sortBy] ?? ''), undefined, { numeric: true }) * dir);
+    }
+    all = all.map(x => {
+      const Employee_Name = empName(x.HRMS_employee_id);
+      return { ...x, Employee_Name, _empName: Employee_Name };
+    });
+    const pg = Math.max(1, +req.query.page || 1), lim = Math.min(200, +req.query.limit || 10);
+    res.json({ success: true, data: all.slice((pg - 1) * lim, pg * lim), total: all.length, page: pg, limit: lim, pages: Math.ceil(all.length / lim) });
+  } catch(e) { err(res, e.message, 500); }
+};
 exports.get = base.get;
 exports.remove = base.remove;
 exports.toggleStatus = base.toggleStatus;

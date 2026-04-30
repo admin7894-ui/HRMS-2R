@@ -4,7 +4,7 @@ export default function AdvanceRecoveryPage() {
   return <GenericModule title="Advance recovery schedules" endpoint="advance-recovery-schedules"
     filterCols={[{key:'payment_status',label:'Status'}]}
     columns={[
-      {key:'HRMS_advance_id',label:'Advance'},
+      {key:'HRMS_advance_id',label:'Advance / employee',render:(_,r)=>r.Advance_Display||r._advanceLabel||r.Employee_Name||r.HRMS_advance_id||'—'},
       {key:'installment_no',label:'#'},
       {key:'due_date',label:'Due date',type:'date'},
       {key:'installment_amount',label:'Amount',type:'currency'},

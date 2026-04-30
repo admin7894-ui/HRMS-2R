@@ -9,7 +9,7 @@ export default function OvertimePage() {
   return <GenericModule title="Overtime" endpoint="overtimes"
     filterCols={[{key:'approval_status',label:'Approval status'}]}
     columns={[
-      {key:'HRMS_employee_id',label:'Employee name',render:(_,r)=>r._empName||r.HRMS_employee_id||'—'},
+      {key:'HRMS_employee_id',label:'Employee name',render:(_,r)=>r.Employee_Name||r._empName||r.HRMS_employee_id||'—'},
       {key:'work_date',label:'Date',type:'date'},
       {key:'overtime_hours',label:'Hours'},
       {key:'overtime_amount',label:'Amount',type:'currency'},

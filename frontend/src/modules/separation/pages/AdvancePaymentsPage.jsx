@@ -5,7 +5,7 @@ export default function AdvancePaymentsPage() {
   return <GenericModule title="Advance payments" endpoint="advance-payments"
     filterCols={[{key:'approval_status',label:'Approval'},{key:'advance_status',label:'Status'}]}
     columns={[
-      {key:'HRMS_employee_id',label:'Employee name',render:(_,r)=>r._empName||r.HRMS_employee_id||'—'},
+      {key:'HRMS_employee_id',label:'Employee name',render:(_,r)=>r.Employee_Name||r._empName||r.HRMS_employee_id||'—'},
       {key:'advance_amount',label:'Amount',type:'currency'},
       {key:'advance_reason',label:'Reason'},
       {key:'approval_status',label:'Approval status',type:'badge'},

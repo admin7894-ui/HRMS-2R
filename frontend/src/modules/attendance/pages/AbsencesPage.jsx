@@ -6,7 +6,7 @@ export default function AbsencesPage() {
   return <GenericModule title="Absences" endpoint="absences"
     filterCols={[{key:'status',label:'Status'}]}
     columns={[
-      {key:'HRMS_employee_id',label:'Employee',render:(_,r)=>r._empName||r.HRMS_employee_id||'—'},
+      {key:'HRMS_employee_id',label:'Employee',render:(_,r)=>r.Employee_Name||r._empName||r.HRMS_employee_id||'—'},
       {key:'start_date',label:'Start date',type:'date'},
       {key:'end_date',label:'End date',type:'date'},
       {key:'days',label:'Days'},

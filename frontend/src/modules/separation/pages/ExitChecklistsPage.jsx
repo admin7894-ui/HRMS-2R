@@ -13,9 +13,9 @@ export default function ExitChecklistsPage() {
   return <GenericModule title="Exit checklists" endpoint="exit-checklists"
     filterCols={[{key:'status',label:'Status'}]}
     columns={[
-      {key:'HRMS_employee_id',label:'Employee',render:(_,r)=>r._empName||r.HRMS_employee_id||'—'},
-      {key:'checklist_item',label:'Checklist item'},
-      {key:'department',label:'Department'},
+      {key:'HRMS_employee_id',label:'Employee',render:(_,r)=>r.Employee_Name||r._empName||r.HRMS_employee_id||'—'},
+      {key:'checklist_item',label:'Checklist item',render:(_,r)=>r.Checklist_Item_Display||r.checklist_item||'—'},
+      {key:'department',label:'Department',render:(_,r)=>r.Department_Name||r._deptName||r.department||'—'},
       {key:'status',label:'Status',type:'badge'},
     ]}
     fields={[

@@ -4,7 +4,7 @@ export default function FinalSettlementsPage() {
   return <GenericModule title="Final settlements" endpoint="final-settlements"
     filterCols={[{key:'settlement_status',label:'Status'}]}
     columns={[
-      {key:'HRMS_employee_id',label:'Employee',render:(_,r)=>r._empName||r.HRMS_employee_id||'—'},
+      {key:'HRMS_employee_id',label:'Employee',render:(_,r)=>r.Employee_Name||r._empName||r.HRMS_employee_id||'—'},
       {key:'total_earnings',label:'Total earnings',type:'currency'},
       {key:'total_deductions',label:'Total deductions',type:'currency'},
       {key:'net_settlement',label:'Net settlement',type:'currency'},

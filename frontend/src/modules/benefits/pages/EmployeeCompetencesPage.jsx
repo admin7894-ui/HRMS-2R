@@ -3,8 +3,8 @@ import GenericModule from '../../GenericModule';
 export default function EmployeeCompetencesPage() {
   return <GenericModule title="Employee competences" endpoint="employee-competences"
     columns={[
-      {key:'HRMS_employee_id',label:'Employee',render:(_,r)=>r._empName||r.HRMS_employee_id||'—'},
-      {key:'HRMS_competence_id',label:'Competence',render:(_,r)=>r._compName||r.HRMS_competence_id||'—'},
+      {key:'HRMS_employee_id',label:'Employee',render:(_,r)=>r.Employee_Name||r._empName||r.HRMS_employee_id||'—'},
+      {key:'HRMS_competence_id',label:'Competence',render:(_,r)=>r.Competence_Name||r._compName||r.HRMS_competence_id||'—'},
       {key:'competence_type',label:'Type',type:'badge'},
     ]}
     fields={[

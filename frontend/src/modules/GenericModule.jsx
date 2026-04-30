@@ -103,9 +103,12 @@ const GenericModule = ({
     if (errors[name]) setErrors(p => ({ ...p, [name]: '' }));
   };
 
+  const makeCode = value => String(value || '').trim().toUpperCase().replace(/\s+/g, '_').replace(/[^A-Z0-9_]/g, '');
+
   const handleNameForCode = (e, codeKey) => {
     handleChange(e);
     if (codeKey && !editing && e.target.value) {
+      setForm(p => ({ ...p, [codeKey]: makeCode(e.target.value) }));
       api.get('/code-preview', { params: { name: e.target.value } })
         .then(r => setForm(p => ({ ...p, [codeKey]: r.data?.code || '' })))
         .catch(() => {});
@@ -114,18 +117,25 @@ const GenericModule = ({
     }
   };
 
-  const validate = () => {
+  const withGeneratedCodes = source => fields.reduce((acc, f) => {
+    if (f.generatesCode && f.codeKey && !editing && acc[f.key] && !acc[f.codeKey]) {
+      return { ...acc, [f.codeKey]: makeCode(acc[f.key]) };
+    }
+    return acc;
+  }, { ...source });
+
+  const validate = (candidate = form) => {
     const errs = {};
-    if (!form.company_id) errs.company_id = 'Please select the Company';
-    if (!form.Business_Type_ID && !form.business_type_id) errs.Business_Type_ID = 'Business type is required';
-    if (!form.business_group_id) errs.business_group_id = 'Business group is required';
-    if (!form.module_id && !form.Module_ID) errs.module_id = 'Please select Module';
-    if (!form.effective_from) errs.effective_from = 'Effective from is required';
+    if (!candidate.company_id) errs.company_id = 'Please select the Company';
+    if (!candidate.Business_Type_ID && !candidate.business_type_id) errs.Business_Type_ID = 'Business type is required';
+    if (!candidate.business_group_id) errs.business_group_id = 'Business group is required';
+    if (!candidate.module_id && !candidate.Module_ID) errs.module_id = 'Please select Module';
+    if (!candidate.effective_from) errs.effective_from = 'Effective from is required';
 
     fields.forEach(f => {
-      const isHidden = typeof f.hidden === 'function' ? f.hidden(form) : f.hidden;
+      const isHidden = typeof f.hidden === 'function' ? f.hidden(candidate) : f.hidden;
       if (isHidden || f.key === 'module_id' || f.key === 'Module_ID') return;
-      const val = form[f.key];
+      const val = candidate[f.key];
       if (f.required && (val === undefined || val === null || val === ''))
         errs[f.key] = `${f.label} is required`;
       if (val != null && val !== '') {
@@ -168,11 +178,13 @@ const GenericModule = ({
 
   const save = async e => {
     if (e?.preventDefault) e.preventDefault();
-    if (!validate()) { toast.error('Please fix the validation errors'); return; }
+    const prepared = withGeneratedCodes(form);
+    setForm(prepared);
+    if (!validate(prepared)) { toast.error('Please fix the validation errors'); return; }
     if (editing && !window.confirm(`Are you sure you want to update this ${title} record?`)) return;
     setLoading(true);
     try {
-      const body = { ...form, updated_by: user?.username || '' };
+      const body = { ...prepared, updated_by: user?.username || '' };
       if (editing) { await crud.update(editing.id, body); toast.success(`${title} updated!`); }
       else { await crud.create(body); toast.success(`${title} created!`); }
       closeModal(); load();
@@ -296,7 +308,7 @@ const GenericModule = ({
     if (f.type === 'alpha') return (
       <Field key={f.key} label={f.label} error={er} required={f.required} tooltip={f.tooltip}>
         <input type="text" {...common}
-          onChange={e => { if (/^[a-zA-Z\s]*$/.test(e.target.value)) handleChange(e); }}
+          onChange={e => { if (/^[a-zA-Z\s]*$/.test(e.target.value)) (f.generatesCode ? handleNameForCode(e, f.codeKey) : handleChange(e)); }}
           placeholder={f.label} maxLength={f.maxLen || 20}
           className={`input ${er ? 'input-err' : ''}`}/>
       </Field>

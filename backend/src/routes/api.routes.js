@@ -33,6 +33,52 @@ const wire = (path, table, searchFlds, codeField, nameField) => {
   r.patch(`/${path}/:id/toggle-status`, c.toggleStatus);
 };
 
+const employeeName = id => {
+  const emp = (db.employees || []).find(e => e.id === id);
+  return emp ? `${emp.First_Name} ${emp.Last_Name}`.trim() : null;
+};
+
+const departmentName = id => {
+  const dept = (db.departments || []).find(d => d.id === id);
+  return dept?.Department_Name || null;
+};
+
+const titleCaseToken = value => String(value || '')
+  .split('_')
+  .filter(Boolean)
+  .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+  .join(' ');
+
+const formatChecklistItems = value => String(value || '')
+  .split(',')
+  .map(v => titleCaseToken(v.trim()))
+  .filter(Boolean)
+  .join(', ');
+
+const listWith = (table, searchFields, enrich) => (req, res) => {
+  try {
+    let all = db[table] || [];
+    if (req.query.q) {
+      const lq = req.query.q.toLowerCase();
+      all = all.filter(x => searchFields.some(f => String(x[f] ?? '').toLowerCase().includes(lq)));
+    }
+    const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder']);
+    Object.entries(req.query).forEach(([k, v]) => {
+      if (!skip.has(k) && v) {
+        const vals = Array.isArray(v) ? v : [v];
+        all = all.filter(x => vals.some(vv => String(x[k] ?? '').toLowerCase() === vv.toLowerCase()));
+      }
+    });
+    if (req.query.sortBy) {
+      const dir = req.query.sortOrder === 'desc' ? -1 : 1;
+      all = [...all].sort((a, b) => String(a[req.query.sortBy] ?? '').localeCompare(String(b[req.query.sortBy] ?? ''), undefined, { numeric: true }) * dir);
+    }
+    all = all.map(enrich);
+    const pg = Math.max(1, +req.query.page || 1), lim = Math.min(200, +req.query.limit || 10);
+    res.json({ success: true, data: all.slice((pg - 1) * lim, pg * lim), total: all.length, page: pg, limit: lim, pages: Math.ceil(all.length / lim) });
+  } catch(e) { err(res, e.message, 500); }
+};
+
 // ── All 59 tables — each with dedicated route + controller instance ──────────
 wire('departments',          'departments',          ['Department_Name']);
 wire('roles',                'roles',                ['Role_Name']);
@@ -381,7 +427,16 @@ r.patch('/supervisors/:id/toggle-status', supCtrl.toggleStatus);
 wire('employee-histories',   'employee_histories',   ['change_type', 'field_changed']);
 wire('holidays',             'holidays',             ['holiday_name', 'holiday_type']);
 wire('absence-types',        'absence_types',        ['absence_name', 'absence_code'], 'absence_code', 'absence_name');
-wire('absences',             'absences',             ['status']);
+const absCtrl = makeController('absences', ['status']);
+r.get('/absences', listWith('absences', ['status'], x => {
+  const Employee_Name = employeeName(x.HRMS_employee_id);
+  return { ...x, Employee_Name, _empName: Employee_Name };
+}));
+r.get('/absences/:id', absCtrl.get);
+r.post('/absences', absCtrl.create);
+r.put('/absences/:id', absCtrl.update);
+r.delete('/absences/:id', absCtrl.remove);
+r.patch('/absences/:id/toggle-status', absCtrl.toggleStatus);
 wire('leave-balances',       'leave_balances',       ['HRMS_employee_id']);
 wire('appraisal-cycles',     'appraisal_cycles',     ['cycle_name']);
 wire('appraisals',           'appraisals',           ['appraisal_status', 'review_period']);
@@ -389,12 +444,88 @@ wire('appraisal-key-areas',  'appraisal_key_areas',  ['key_area_name']);
 wire('employee-appraisals',  'employee_appraisals',  ['appraisal_status']);
 wire('appraisal-ratings',    'appraisal_ratings',    ['key_area_name']);
 wire('competences',          'competences',          ['competence_name', 'competence_code'], 'competence_code', 'competence_name');
-wire('employee-competences', 'employee_competences', ['competence_type']);
-wire('separations',          'separations',          ['separation_type', 'separation_status']);
-wire('exit-checklists',      'exit_checklists',      ['checklist_item', 'status']);
-wire('final-settlements',    'final_settlements',    ['settlement_status']);
-wire('advance-payments',     'advance_payments',     ['advance_reason', 'advance_status']);
-wire('advance-recovery-schedules', 'advance_recovery_schedules', ['payment_status']);
+const ecCtrl = makeController('employee_competences', ['competence_type']);
+r.get('/employee-competences', (req, res) => {
+  try {
+    let all = db.employee_competences || [];
+    if (req.query.q) { const lq = req.query.q.toLowerCase(); all = all.filter(x => String(x.competence_type ?? '').toLowerCase().includes(lq)); }
+    const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder']);
+    Object.entries(req.query).forEach(([k, v]) => { if (!skip.has(k) && v) { const vals = Array.isArray(v) ? v : [v]; all = all.filter(x => vals.some(vv => String(x[k] ?? '').toLowerCase() === vv.toLowerCase())); } });
+    if (req.query.sortBy) { const dir = req.query.sortOrder === 'desc' ? -1 : 1; all = [...all].sort((a, b) => String(a[req.query.sortBy] ?? '').localeCompare(String(b[req.query.sortBy] ?? ''), undefined, { numeric: true }) * dir); }
+    all = all.map(x => {
+      const emp = (db.employees || []).find(e => e.id === x.HRMS_employee_id);
+      const comp = (db.competences || []).find(c => c.id === x.HRMS_competence_id);
+      const Employee_Name = emp ? `${emp.First_Name} ${emp.Last_Name}`.trim() : null;
+      const Competence_Name = comp?.competence_name || null;
+      return { ...x, Employee_Name, Competence_Name, _empName: Employee_Name, _compName: Competence_Name };
+    });
+    const pg = Math.max(1, +req.query.page || 1), lim = Math.min(200, +req.query.limit || 10);
+    res.json({ success: true, data: all.slice((pg - 1) * lim, pg * lim), total: all.length, page: pg, limit: lim, pages: Math.ceil(all.length / lim) });
+  } catch(e) { err(res, e.message, 500); }
+});
+r.get('/employee-competences/:id',              ecCtrl.get);
+r.post('/employee-competences',                 ecCtrl.create);
+r.put('/employee-competences/:id',              ecCtrl.update);
+r.delete('/employee-competences/:id',           ecCtrl.remove);
+r.patch('/employee-competences/:id/toggle-status', ecCtrl.toggleStatus);
+const sepCtrl = makeController('separations', ['separation_type', 'separation_status']);
+r.get('/separations', listWith('separations', ['separation_type', 'separation_status'], x => {
+  const Employee_Name = employeeName(x.HRMS_employee_id);
+  return { ...x, Employee_Name, _empName: Employee_Name };
+}));
+r.get('/separations/:id', sepCtrl.get);
+r.post('/separations', sepCtrl.create);
+r.put('/separations/:id', sepCtrl.update);
+r.delete('/separations/:id', sepCtrl.remove);
+r.patch('/separations/:id/toggle-status', sepCtrl.toggleStatus);
+
+const excCtrl = makeController('exit_checklists', ['checklist_item', 'status']);
+r.get('/exit-checklists', listWith('exit_checklists', ['checklist_item', 'status'], x => {
+  const Employee_Name = employeeName(x.HRMS_employee_id);
+  const Department_Name = departmentName(x.department) || x.department || null;
+  const Checklist_Item_Display = formatChecklistItems(x.checklist_item);
+  return { ...x, Employee_Name, Department_Name, Checklist_Item_Display, _empName: Employee_Name, _deptName: Department_Name };
+}));
+r.get('/exit-checklists/:id', excCtrl.get);
+r.post('/exit-checklists', excCtrl.create);
+r.put('/exit-checklists/:id', excCtrl.update);
+r.delete('/exit-checklists/:id', excCtrl.remove);
+r.patch('/exit-checklists/:id/toggle-status', excCtrl.toggleStatus);
+
+const fsCtrl = makeController('final_settlements', ['settlement_status']);
+r.get('/final-settlements', listWith('final_settlements', ['settlement_status'], x => {
+  const Employee_Name = employeeName(x.HRMS_employee_id);
+  return { ...x, Employee_Name, _empName: Employee_Name };
+}));
+r.get('/final-settlements/:id', fsCtrl.get);
+r.post('/final-settlements', fsCtrl.create);
+r.put('/final-settlements/:id', fsCtrl.update);
+r.delete('/final-settlements/:id', fsCtrl.remove);
+r.patch('/final-settlements/:id/toggle-status', fsCtrl.toggleStatus);
+
+const advCtrl = makeController('advance_payments', ['advance_reason', 'advance_status']);
+r.get('/advance-payments', listWith('advance_payments', ['advance_reason', 'advance_status'], x => {
+  const Employee_Name = employeeName(x.HRMS_employee_id);
+  return { ...x, Employee_Name, _empName: Employee_Name };
+}));
+r.get('/advance-payments/:id', advCtrl.get);
+r.post('/advance-payments', advCtrl.create);
+r.put('/advance-payments/:id', advCtrl.update);
+r.delete('/advance-payments/:id', advCtrl.remove);
+r.patch('/advance-payments/:id/toggle-status', advCtrl.toggleStatus);
+
+const arsCtrl = makeController('advance_recovery_schedules', ['payment_status']);
+r.get('/advance-recovery-schedules', listWith('advance_recovery_schedules', ['payment_status'], x => {
+  const advance = (db.advance_payments || []).find(a => a.id === x.HRMS_advance_id);
+  const Employee_Name = employeeName(advance?.HRMS_employee_id);
+  const Advance_Display = advance ? `${advance._displayId || advance.id}${Employee_Name ? ' - ' + Employee_Name : ''}` : x.HRMS_advance_id;
+  return { ...x, Employee_Name, Advance_Display, _empName: Employee_Name, _advanceLabel: Advance_Display };
+}));
+r.get('/advance-recovery-schedules/:id', arsCtrl.get);
+r.post('/advance-recovery-schedules', arsCtrl.create);
+r.put('/advance-recovery-schedules/:id', arsCtrl.update);
+r.delete('/advance-recovery-schedules/:id', arsCtrl.remove);
+r.patch('/advance-recovery-schedules/:id/toggle-status', arsCtrl.toggleStatus);
 wire('user-employees',       'user_employees',       ['Employee_ID']);
 
 // ── Benefit Plans — special auto-code BP001+ ─────────────────────────────────
@@ -412,7 +543,24 @@ r.patch('/benefit-plans/:id/toggle-status', bpBase.toggleStatus);
 
 // ── Benefit Enrollments — no Assignment ID ───────────────────────────────────
 const beBase = makeController('benefit_enrollments', ['enrollment_status']);
-r.get('/benefit-enrollments', beBase.list);
+r.get('/benefit-enrollments', (req, res) => {
+  try {
+    let all = db.benefit_enrollments || [];
+    if (req.query.q) { const lq = req.query.q.toLowerCase(); all = all.filter(x => String(x.enrollment_status ?? '').toLowerCase().includes(lq)); }
+    const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder']);
+    Object.entries(req.query).forEach(([k, v]) => { if (!skip.has(k) && v) { const vals = Array.isArray(v) ? v : [v]; all = all.filter(x => vals.some(vv => String(x[k] ?? '').toLowerCase() === vv.toLowerCase())); } });
+    if (req.query.sortBy) { const dir = req.query.sortOrder === 'desc' ? -1 : 1; all = [...all].sort((a, b) => String(a[req.query.sortBy] ?? '').localeCompare(String(b[req.query.sortBy] ?? ''), undefined, { numeric: true }) * dir); }
+    all = all.map(x => {
+      const emp = (db.employees || []).find(e => e.id === x.HRMS_employee_id);
+      const plan = (db.benefit_plans || []).find(p => p.id === x.HRMS_benefit_plan_id);
+      const Employee_Name = emp ? `${emp.First_Name} ${emp.Last_Name}`.trim() : null;
+      const Benefit_Plan_Name = plan?.benefit_plan_name || null;
+      return { ...x, Employee_Name, Benefit_Plan_Name, _empName: Employee_Name, _planName: Benefit_Plan_Name };
+    });
+    const pg = Math.max(1, +req.query.page || 1), lim = Math.min(200, +req.query.limit || 10);
+    res.json({ success: true, data: all.slice((pg - 1) * lim, pg * lim), total: all.length, page: pg, limit: lim, pages: Math.ceil(all.length / lim) });
+  } catch(e) { err(res, e.message, 500); }
+});
 r.get('/benefit-enrollments/:id', beBase.get);
 r.post('/benefit-enrollments', (req, res) => {
   const body = { ...req.body };
