@@ -32,6 +32,7 @@ export default function TimeCardsPage() {
       {key:'hours_worked',label:'Total hours worked',type:'readonly',help:'Auto-calculated from clock in and clock out'},
       {key:'attendance_status',label:'Attendance status',required:true,type:'select',options:[{v:'PRESENT',l:'Present'},{v:'ABSENT',l:'Absent'},{v:'HALF_DAY',l:'Half-day'},{v:'LEAVE',l:'On leave'},{v:'HOLIDAY',l:'Holiday'}]},
       {key:'approval_status',label:'Approval status',required:true,type:'select',options:[{v:'PENDING',l:'Pending'},{v:'APPROVED',l:'Approved'},{v:'REJECTED',l:'Rejected'}]},
+      {key:'description',label:'Description',type:'textarea',maxLen:300},
       {key:'approved_by',label:'Approved by',type:'lov',lovEndpoint:'employees',labelFn:o=>`${o.First_Name} ${o.Last_Name}`,tooltip:'Auto-filled from employee supervisor. Can be overridden.'},
     ]}
     extraForm={({form, lovData, setForm}) => {

@@ -2,7 +2,7 @@
 const express = require('express');
 const path = require('path');
 const { auth } = require('../middleware/auth');
-const { db, create, update, paginate, search } = require('../seed/store');
+const { db, create, update, getById, paginate, search } = require('../seed/store');
 const { ok, err } = require('../utils/response');
 const { genId, genCodeFromName, genBenefitCode } = require('../utils/idGen');
 const { makeController } = require('../controllers/base.controller');
@@ -60,6 +60,13 @@ const formatChecklistItems = value => String(value || '')
   .filter(Boolean)
   .join(', ');
 
+const applyEmployeeIdFilter = (arr, employeeId) => {
+  if (!employeeId) return arr;
+  const eid = String(employeeId).toLowerCase();
+  const keys = ['HRMS_employee_id', 'HRMS_Employee_ID', 'Employee_ID', 'employee_id'];
+  return (arr || []).filter(x => keys.some(k => String(x?.[k] ?? '').toLowerCase() === eid));
+};
+
 const listWith = (table, searchFields, enrich) => (req, res) => {
   try {
     let all = db[table] || [];
@@ -67,7 +74,11 @@ const listWith = (table, searchFields, enrich) => (req, res) => {
       const lq = req.query.q.toLowerCase();
       all = all.filter(x => searchFields.some(f => String(x[f] ?? '').toLowerCase().includes(lq)));
     }
-    const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder']);
+    // Common filter alias: employee_id -> various employee columns
+    if (req.query.employee_id) {
+      all = applyEmployeeIdFilter(all, req.query.employee_id);
+    }
+    const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder', 'employee_id']);
     Object.entries(req.query).forEach(([k, v]) => {
       if (!skip.has(k) && v) {
         const vals = Array.isArray(v) ? v : [v];
@@ -100,7 +111,17 @@ wire('table-accesses',       'table_accesses',       ['TABLE_ACCESS']);
 wire('salary-amounts',       'salary_amounts',       ['Currency_Code']);
 wire('salary-ranges',        'salary_ranges',        ['Currency_Code']);
 wire('grades',               'grades',               ['Grade_Name', 'Grade_Code'], 'Grade_Code', 'Grade_Name');
-wire('grade-steps',          'grade_steps',          ['Step_Name']);
+// Grade steps — enrich with grade name
+const gsCtrl = makeController('grade_steps', ['Step_Name']);
+r.get('/grade-steps', listWith('grade_steps', ['Step_Name'], x => {
+  const grade = (db.grades || []).find(g => g.id === x.HRMS_Grade_ID);
+  return { ...x, _gradeName: grade?.Grade_Name || null, Grade_Name: grade?.Grade_Name || null };
+}));
+r.get('/grade-steps/:id', gsCtrl.get);
+r.post('/grade-steps', gsCtrl.create);
+r.put('/grade-steps/:id', gsCtrl.update);
+r.delete('/grade-steps/:id', gsCtrl.remove);
+r.patch('/grade-steps/:id/toggle-status', gsCtrl.toggleStatus);
 wire('grade-ladders',        'grade_ladders',        ['Ladder_Name']);
 wire('jobs',                 'jobs',                 ['Job_Name', 'Job_Code'], 'Job_Code', 'Job_Name');
 // Positions — enrich list with _jobName and _gradeName
@@ -153,8 +174,12 @@ r.get('/requisitions', (req, res) => {
     if (req.query.sortBy) { const dir = req.query.sortOrder==='desc'?-1:1; all = [...all].sort((a,b) => String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
     all = all.map(x => ({
       ...x,
+      // Normalize for LOV display
+      Requisition_ID: x._displayId || x.HRMS_Requisition_ID || x.Requisition_ID || x.id,
+      Requisition_Code: x._displayId || x.HRMS_Requisition_ID || x.Requisition_ID || x.id,
       _deptName:     (db.departments||[]).find(d => d.id === x.HRMS_Department_ID)?.Department_Name || null,
       _positionName: (db.positions||[]).find(p => p.id === x.HRMS_Position_ID)?.Position_Name     || null,
+      Position_Name: (db.positions||[]).find(p => p.id === x.HRMS_Position_ID)?.Position_Name     || null,
     }));
     const pg = Math.max(1,+req.query.page||1), lim = Math.min(200,+req.query.limit||10);
     res.json({ success:true, data:all.slice((pg-1)*lim,pg*lim), total:all.length, page:pg, limit:lim, pages:Math.ceil(all.length/lim) });
@@ -174,7 +199,8 @@ r.get('/applications', (req, res) => {
   try {
     let all = db.applications || [];
     if (req.query.q) { const lq=req.query.q.toLowerCase(); all=all.filter(x=>['Application_Status','Email_ID','First_Name','Last_Name'].some(f=>String(x[f]??'').toLowerCase().includes(lq))); }
-    const skip = new Set(['q','page','limit','sortBy','sortOrder']);
+    all = applyEmployeeIdFilter(all, req.query.employee_id);
+    const skip = new Set(['q','page','limit','sortBy','sortOrder','employee_id']);
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k)&&v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
     // Backfill _displayId for records that don't have one yet
@@ -205,13 +231,33 @@ r.get('/interviews', (req, res) => {
     if (req.query.sortBy) { const dir = req.query.sortOrder==='desc'?-1:1; all = [...all].sort((a,b) => String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
     all = all.map(x => {
       const app = (db.applications||[]).find(a => a.id === x.HRMS_Application_ID);
-      return { ...x, _applicationName: app ? `${app.First_Name} ${app.Last_Name}`.trim() : null };
+      const Applicant_Name = app ? `${app.First_Name} ${app.Last_Name}`.trim() : null;
+      return {
+        ...x,
+        _applicationName: Applicant_Name,
+        Applicant_Name,
+        Interview_Code: x._displayId || x.HRMS_Interview_ID || x.id,
+      };
     });
     const pg = Math.max(1,+req.query.page||1), lim = Math.min(200,+req.query.limit||10);
     res.json({ success:true, data:all.slice((pg-1)*lim,pg*lim), total:all.length, page:pg, limit:lim, pages:Math.ceil(all.length/lim) });
   } catch(e) { err(res,e.message,500); }
 });
-r.get('/interviews/:id',              intCtrl.get);
+// Interviews get — enrich with derived requisition from application → job posting
+r.get('/interviews/:id', (req, res) => {
+  const x = (db.interviews || []).find(r => r.id === req.params.id);
+  if (!x) return err(res, 'Record not found', 404);
+  const app = (db.applications || []).find(a => a.id === x.HRMS_Application_ID);
+  const Applicant_Name = app ? `${app.First_Name} ${app.Last_Name}`.trim() : null;
+  const posting = app?.HRMS_Job_Posting_ID ? (db.job_postings || []).find(j => j.id === app.HRMS_Job_Posting_ID) : null;
+  const HRMS_Requisition_ID = posting?.HRMS_Requisition_ID || app?.HRMS_Requisition_ID || null;
+  ok(res, {
+    ...x,
+    Applicant_Name,
+    Interview_Code: x._displayId || x.HRMS_Interview_ID || x.id,
+    HRMS_Requisition_ID,
+  });
+});
 r.post('/interviews',                 intCtrl.create);
 r.put('/interviews/:id',              intCtrl.update);
 r.delete('/interviews/:id',           intCtrl.remove);
@@ -224,7 +270,8 @@ r.get('/template-assignments', (req, res) => {
   try {
     let all = db.template_assignments || [];
     if (req.query.q) { const lq = req.query.q.toLowerCase(); all = all.filter(x => String(x.Assigned_Date??'').toLowerCase().includes(lq)); }
-    const skip = new Set(['q','page','limit','sortBy','sortOrder']);
+    all = applyEmployeeIdFilter(all, req.query.employee_id);
+    const skip = new Set(['q','page','limit','sortBy','sortOrder','employee_id']);
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k) && v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
     all = all.map(x => {
@@ -248,7 +295,8 @@ r.get('/consent-letters', (req, res) => {
   try {
     let all = db.consent_letters || [];
     if (req.query.q) { const lq=req.query.q.toLowerCase(); all=all.filter(x=>String(x.Consent_Letter_Signed??'').toLowerCase().includes(lq)); }
-    const skip = new Set(['q','page','limit','sortBy','sortOrder']);
+    all = applyEmployeeIdFilter(all, req.query.employee_id);
+    const skip = new Set(['q','page','limit','sortBy','sortOrder','employee_id']);
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k) && v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
     all = all.map(x => {
@@ -271,7 +319,8 @@ r.get('/offer-letters', (req, res) => {
   try {
     let all = db.offer_letters || [];
     if (req.query.q) { const lq=req.query.q.toLowerCase(); all=all.filter(x=>String(x.Duration_Type??'').toLowerCase().includes(lq)); }
-    const skip = new Set(['q','page','limit','sortBy','sortOrder']);
+    all = applyEmployeeIdFilter(all, req.query.employee_id);
+    const skip = new Set(['q','page','limit','sortBy','sortOrder','employee_id']);
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k)&&v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
     all = all.map(x => {
@@ -329,7 +378,8 @@ r.get('/bank-accounts', (req, res) => {
   try {
     let all = db.bank_accounts || [];
     if (req.query.q) { const lq=req.query.q.toLowerCase(); all=all.filter(x=>['Bank_Name','Account_Number'].some(f=>String(x[f]??'').toLowerCase().includes(lq))); }
-    const skip = new Set(['q','page','limit','sortBy','sortOrder']);
+    all = applyEmployeeIdFilter(all, req.query.employee_id);
+    const skip = new Set(['q','page','limit','sortBy','sortOrder','employee_id']);
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k)&&v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
     all = all.map(x => {
@@ -408,7 +458,8 @@ r.get('/supervisors', (req, res) => {
   try {
     let all = db.supervisors || [];
     if (req.query.q) { const lq=req.query.q.toLowerCase(); all=all.filter(x=>String(x.HRMS_employee_id??'').toLowerCase().includes(lq)); }
-    const skip = new Set(['q','page','limit','sortBy','sortOrder']);
+    all = applyEmployeeIdFilter(all, req.query.employee_id);
+    const skip = new Set(['q','page','limit','sortBy','sortOrder','employee_id']);
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k)&&v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
     all = all.map(x => {
@@ -431,7 +482,17 @@ r.post('/supervisors',                 supCtrl.create);
 r.put('/supervisors/:id',              supCtrl.update);
 r.delete('/supervisors/:id',           supCtrl.remove);
 r.patch('/supervisors/:id/toggle-status', supCtrl.toggleStatus);
-wire('employee-histories',   'employee_histories',   ['change_type', 'field_changed']);
+// Employee Histories — enrich with Employee_Name so UI can display name instead of raw ID
+const ehCtrl = makeController('employee_histories', ['change_type', 'field_changed']);
+r.get('/employee-histories', listWith('employee_histories', ['change_type', 'field_changed'], x => {
+  const Employee_Name = employeeName(x.HRMS_employee_id);
+  return { ...x, Employee_Name, _empName: Employee_Name };
+}));
+r.get('/employee-histories/:id', ehCtrl.get);
+r.post('/employee-histories', ehCtrl.create);
+r.put('/employee-histories/:id', ehCtrl.update);
+r.delete('/employee-histories/:id', ehCtrl.remove);
+r.patch('/employee-histories/:id/toggle-status', ehCtrl.toggleStatus);
 wire('holidays',             'holidays',             ['holiday_name', 'holiday_type']);
 wire('absence-types',        'absence_types',        ['absence_name', 'absence_code'], 'absence_code', 'absence_name');
 const absCtrl = makeController('absences', ['status']);
@@ -468,8 +529,66 @@ r.get('/appraisals', listWith('appraisals', ['appraisal_status', 'review_period'
   };
 }));
 r.get('/appraisals/:id', apprCtrl.get);
-r.post('/appraisals', apprCtrl.create);
-r.put('/appraisals/:id', apprCtrl.update);
+const appraisalSummary = appr => {
+  const cycle = (db.appraisal_cycles || []).find(c => c.id === appr?.HRMS_appraisal_cycle_id);
+  const cycleName = cycle?.cycle_name || appr?.cycle_name || appr?.review_period || 'Appraisal';
+  const rating = appr?.overall_rating ?? '';
+  return `${cycleName} — Rating: ${rating}`.trim();
+};
+
+const insertAppraisalHistory = ({ changeType, appraisal, oldValue, newValue, changedBy }) => {
+  return create('employee_histories', {
+    HRMS_employee_id: appraisal?.HRMS_employee_id || null,
+    HRMS_assignment_id: appraisal?.HRMS_assignment_id || null,
+    company_id: appraisal?.company_id || null,
+    business_group_id: appraisal?.business_group_id || null,
+    business_type_id: appraisal?.business_type_id || null,
+    module_id: appraisal?.module_id || null,
+    change_type: changeType,
+    field_changed: 'appraisal',
+    old_value: oldValue ?? null,
+    new_value: newValue ?? null,
+    change_date: new Date().toISOString(),
+    changed_by: changedBy || 'system',
+    active_flag: 'Y',
+    created_by: changedBy || 'system',
+    updated_by: changedBy || 'system',
+  });
+};
+
+// Appraisals — auto-sync to Employee History after successful create/update
+r.post('/appraisals', (req, res) => {
+  try {
+    const body = { ...req.body, created_by: req.user?.username, updated_by: req.user?.username, active_flag: 'Y' };
+    const saved = create('appraisals', body);
+    insertAppraisalHistory({
+      changeType: 'CREATE',
+      appraisal: saved,
+      oldValue: '—',
+      newValue: appraisalSummary(saved),
+      changedBy: req.user?.username,
+    });
+    ok(res, saved, 'Created', 201);
+  } catch (e) { err(res, e.message, 500); }
+});
+
+r.put('/appraisals/:id', (req, res) => {
+  try {
+    const before = getById('appraisals', req.params.id);
+    if (!before) return err(res, 'Not found', 404);
+    const body = { ...req.body, updated_by: req.user?.username };
+    const saved = update('appraisals', req.params.id, body);
+    if (!saved) return err(res, 'Not found', 404);
+    insertAppraisalHistory({
+      changeType: 'UPDATE',
+      appraisal: saved,
+      oldValue: appraisalSummary(before),
+      newValue: appraisalSummary(saved),
+      changedBy: req.user?.username,
+    });
+    ok(res, saved, 'Updated');
+  } catch (e) { err(res, e.message, 500); }
+});
 r.delete('/appraisals/:id', apprCtrl.remove);
 r.patch('/appraisals/:id/toggle-status', apprCtrl.toggleStatus);
 wire('appraisal-key-areas',  'appraisal_key_areas',  ['key_area_name']);

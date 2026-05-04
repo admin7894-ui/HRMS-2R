@@ -1,6 +1,7 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import GenericModule from '../../GenericModule';
+import api from '../../../utils/api';
 // Salary Offered not NaN fix; Signed shows Yes/No; All dropdowns show names; Position/Grade/Joining etc. fields
 export default function OfferLettersPage() {
   return <GenericModule title="Offer letters" endpoint="offer-letters"
@@ -25,5 +26,52 @@ export default function OfferLettersPage() {
       {key:'Duration_Type',label:'Duration type',type:'select',options:[{v:'PERMANENT',l:'Permanent'},{v:'CONTRACT',l:'Contract'},{v:'TEMPORARY',l:'Temporary'},{v:'INTERN',l:'Internship'}],section:'Details'},
       {key:'Offer_Letter_Signed',label:'Offer letter signed',type:'select',options:[{v:'Y',l:'Yes'},{v:'N',l:'No'}],section:'Details'},
     ]}
+    extraForm={({ form, setForm }) => {
+      const prevAppId = useRef(null);
+
+      useEffect(() => {
+        const appId = form.HRMS_Application_ID;
+        if (!appId || appId === prevAppId.current) return;
+        prevAppId.current = appId;
+
+        api.get(`/applications/${appId}`).then(res => {
+          const app = res?.data || res || {};
+          const applicantId = app.HRMS_Applicant_ID ?? app.Applicant_ID ?? app.applicant_id;
+          const requisitionId = app.HRMS_Requisition_ID ?? app.Requisition_ID ?? app.requisition_id;
+          const jobPostingId = app.HRMS_Job_Posting_ID ?? app.Job_Posting_ID ?? app.job_posting_id;
+
+          // Populate only if data exists; keep editable (user can change later)
+          if (jobPostingId) {
+            api.get(`/job-postings/${jobPostingId}`).then(r2 => {
+              const posting = r2?.data || r2 || {};
+              const posId = posting.HRMS_Position_ID ?? posting.Position_ID ?? posting.position_id;
+              setForm(p => ({
+                ...p,
+                HRMS_Application_ID: appId,
+                ...(applicantId ? { HRMS_Applicant_ID: applicantId } : {}),
+                ...(requisitionId ? { HRMS_Requisition_ID: requisitionId } : {}),
+                ...(posId ? { HRMS_Position_ID: posId } : {}),
+              }));
+            }).catch(() => {
+              setForm(p => ({
+                ...p,
+                HRMS_Application_ID: appId,
+                ...(applicantId ? { HRMS_Applicant_ID: applicantId } : {}),
+                ...(requisitionId ? { HRMS_Requisition_ID: requisitionId } : {}),
+              }));
+            });
+          } else {
+            setForm(p => ({
+              ...p,
+              HRMS_Application_ID: appId,
+              ...(applicantId ? { HRMS_Applicant_ID: applicantId } : {}),
+              ...(requisitionId ? { HRMS_Requisition_ID: requisitionId } : {}),
+            }));
+          }
+        }).catch(() => {});
+      }, [form.HRMS_Application_ID, setForm]);
+
+      return null;
+    }}
   />;
 }

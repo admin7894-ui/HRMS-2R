@@ -1,8 +1,46 @@
-const {v4:uuidv4}=require('uuid');
-const bcrypt=require('bcryptjs');
+const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcryptjs');
+const fs = require('fs');
+const path = require('path');
+
+const DATA_DIR = path.join(__dirname, '..', '..', 'data');
+const DATA_FILE = path.join(DATA_DIR, 'db.json');
+
+const ensureDataDir = () => {
+  try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch { /* ignore */ }
+};
+
+const loadDbFromDisk = () => {
+  try {
+    if (!fs.existsSync(DATA_FILE)) return null;
+    const raw = fs.readFileSync(DATA_FILE, 'utf8');
+    const parsed = JSON.parse(raw || '{}');
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
+let persistTimer = null;
+const persistDbToDisk = () => {
+  try {
+    ensureDataDir();
+    fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), 'utf8');
+  } catch {
+    // ignore disk persistence errors (app will still run in-memory)
+  }
+};
+
+const schedulePersist = () => {
+  if (persistTimer) return;
+  persistTimer = setTimeout(() => {
+    persistTimer = null;
+    persistDbToDisk();
+  }, 50);
+};
 const a=(by='system')=>({active_flag:'Y',effective_from:'2024-01-01',effective_to:null,created_by:by,updated_by:by,created_at:new Date().toISOString(),updated_at:new Date().toISOString()});
 
-const db={
+const seededDb = {
 _users:[
   {id:'U1',username:'admin@hrms.com',password:bcrypt.hashSync('admin123',8),role:'Admin',name:'Admin User',...a()},
   {id:'U2',username:'hr@hrms.com',password:bcrypt.hashSync('hr123',8),role:'HR',name:'HR Manager',...a()},
@@ -19,6 +57,9 @@ business_types:[
   {id:'BT1',Business_Type_ID:'BT1',Business_Type_Name:'IT Services',Business_Type_Code:'IT',module_id:'MOD1',company_id:'C1',business_group_id:'BG1',business_type_id:'BT1',...a()},
   {id:'BT2',Business_Type_ID:'BT2',Business_Type_Name:'Manufacturing',Business_Type_Code:'MFG',module_id:'MOD1',company_id:'C1',business_group_id:'BG1',business_type_id:'BT1',...a()},
   {id:'BT3',Business_Type_ID:'BT3',Business_Type_Name:'Finance',Business_Type_Code:'FIN',module_id:'MOD1',company_id:'C1',business_group_id:'BG1',business_type_id:'BT1',...a()},
+  // TechStar Ltd additions (Effective From: 04-05-2026)
+  {id:'BT4',Business_Type_ID:'BT4',Business_Type_Name:'Software Development',Business_Type_Code:'SOFTWARE_DEVELOPMENT',Module_ID:'MOD1',Company_ID:'C2',module_id:'MOD1',company_id:'C2',business_group_id:'BG3',business_type_id:'BT4',...a(),effective_from:'2026-05-04'},
+  {id:'BT5',Business_Type_ID:'BT5',Business_Type_Name:'IT Consulting',Business_Type_Code:'IT_CONSULTING',Module_ID:'MOD1',Company_ID:'C2',module_id:'MOD1',company_id:'C2',business_group_id:'BG4',business_type_id:'BT5',...a(),effective_from:'2026-05-04'},
 ],
 companies:[
   {id:'C1',Company_ID:'C1',Company_Name:'VVSPL Pvt Ltd',Module_ID:'MOD1',Business_Type_ID:'BT1',PAN:'AABCV1234D',GST:'27AABCV1234D1ZK',TAN:'PNEC12345A',Authorized_Person:'Vikram Shah',Incorporation_Date:'2010-01-15',Website_URL:'www.vvspl.com',company_id:'C1',business_group_id:'BG1',business_type_id:'BT1',module_id:'MOD1',...a()},
@@ -31,6 +72,9 @@ locations:[
 business_groups:[
   {id:'BG1',BG_ID:'BG1',BG_Name:'Technology Division',Module_ID:'MOD1',Company_ID:'C1',Location_ID:'L1',company_id:'C1',business_group_id:'BG1',business_type_id:'BT1',module_id:'MOD1',...a()},
   {id:'BG2',BG_ID:'BG2',BG_Name:'Operations Division',Module_ID:'MOD1',Company_ID:'C1',Location_ID:'L2',company_id:'C1',business_group_id:'BG1',business_type_id:'BT1',module_id:'MOD1',...a()},
+  // TechStar Ltd additions (Effective From: 04-05-2026)
+  {id:'BG3',BG_ID:'BG3',BG_Name:'Product Division',Module_ID:'MOD1',Company_ID:'C2',Location_ID:'L2',company_id:'C2',business_group_id:'BG3',business_type_id:'BT4',module_id:'MOD1',...a(),effective_from:'2026-05-04'},
+  {id:'BG4',BG_ID:'BG4',BG_Name:'Services Division',Module_ID:'MOD1',Company_ID:'C2',Location_ID:'L2',company_id:'C2',business_group_id:'BG4',business_type_id:'BT5',module_id:'MOD1',...a(),effective_from:'2026-05-04'},
 ],
 departments:[
   {id:'D1',Department_ID:'D1',Department_Name:'Engineering',Module_ID:'MOD1',company_id:'C1',business_group_id:'BG1',business_type_id:'BT1',module_id:'MOD1',...a()},
@@ -252,11 +296,35 @@ user_employees:[
 ],
 };
 
+// Use persisted DB if available; otherwise fall back to seeded data
+const db = loadDbFromDisk() || seededDb;
+// If we loaded from disk, ensure any newly added seed tables don't break runtime
+Object.keys(seededDb).forEach(k => { if (!db[k]) db[k] = seededDb[k]; });
+
 const getAll=(t)=>(db[t]||[]).filter(r=>r.active_flag!=='N');
 const getById=(t,id)=>(db[t]||[]).find(r=>r.id===id)||null;
-const create=(t,d)=>{if(!db[t])db[t]=[];const r={id:uuidv4(),...d,created_at:new Date().toISOString(),updated_at:new Date().toISOString()};db[t].push(r);return r;};
-const update=(t,id,d)=>{const i=(db[t]||[]).findIndex(r=>r.id===id);if(i===-1)return null;db[t][i]={...db[t][i],...d,updated_at:new Date().toISOString()};return db[t][i];};
-const softDelete=(t,id)=>{const i=(db[t]||[]).findIndex(r=>r.id===id);if(i===-1)return false;db[t][i].active_flag='N';db[t][i].updated_at=new Date().toISOString();return true;};
+const create=(t,d)=>{
+  if(!db[t]) db[t]=[];
+  const r={id:uuidv4(),...d,created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
+  db[t].push(r);
+  schedulePersist();
+  return r;
+};
+const update=(t,id,d)=>{
+  const i=(db[t]||[]).findIndex(r=>r.id===id);
+  if(i===-1) return null;
+  db[t][i]={...db[t][i],...d,updated_at:new Date().toISOString()};
+  schedulePersist();
+  return db[t][i];
+};
+const softDelete=(t,id)=>{
+  const i=(db[t]||[]).findIndex(r=>r.id===id);
+  if(i===-1) return false;
+  db[t][i].active_flag='N';
+  db[t][i].updated_at=new Date().toISOString();
+  schedulePersist();
+  return true;
+};
 const paginate=(arr,page=1,limit=10)=>{const p=Math.max(1,+page),l=Math.min(100,+limit||10);return{data:arr.slice((p-1)*l,p*l),total:arr.length,page:p,limit:l,pages:Math.ceil(arr.length/l)};};
 const search=(arr,q,flds)=>{if(!q)return arr;const lq=q.toLowerCase();return arr.filter(r=>flds.some(f=>r[f]!=null&&String(r[f]).toLowerCase().includes(lq)));};
 

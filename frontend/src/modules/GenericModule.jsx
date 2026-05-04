@@ -367,7 +367,7 @@ const GenericModule = ({
             modules={lovData['modules'] || []}
             errors={errors}/>
 
-          {extraForm && extraForm({ form, onChange: handleChange, errors, lovData, setForm })}
+          {extraForm && extraForm({ form, onChange: handleChange, errors, lovData, setLovData, setForm, api })}
 
           {hasSections
             ? Object.entries(grouped).map(([sec, flds]) => (

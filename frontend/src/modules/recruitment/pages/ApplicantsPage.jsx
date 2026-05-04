@@ -25,6 +25,8 @@ function ApplicantAutoFill({ form, setForm }) {
         assignIfPresent('Phone', app.Phone_Number);
         assignIfPresent('Date_of_Birth', app.Date_of_Birth);
         assignIfPresent('Source', app.Source);
+        // Link posting selection from public /apply (applications.HRMS_Job_Posting_ID)
+        assignIfPresent('Job_Posting_ID', app.HRMS_Job_Posting_ID ?? app.Job_Posting_ID);
         assignIfPresent('Aadhar_Card_Number', app.Aadhar_Card_Number ?? app.Aadhaar_Number);
         assignIfPresent('PAN_Card_Number', app.PAN_Card_Number ?? app.PAN_Number);
         assignIfPresent('Aadhar_Card_Upload', app.Aadhar_Upload ?? app.Aadhaar_File);
@@ -51,7 +53,8 @@ export default function ApplicantsPage() {
       { key: 'Phone', label: 'Mobile number', required: true, type: 'phone', section: 'Personal' },
       { key: 'Date_of_Birth', label: 'Date of birth', required: true, type: 'date', section: 'Personal' },
       { key: 'Source', label: 'Source', type: 'select', options: [{ v: 'PORTAL', l: 'Job portal' }, { v: 'LINKEDIN', l: 'LinkedIn' }, { v: 'REFERRAL', l: 'Referral' }, { v: 'DIRECT', l: 'Direct' }, { v: 'WEBSITE', l: 'Website' }, { v: 'SOCIAL', l: 'Social media' }], section: 'Personal' },
-      { key: 'Posting_Title', label: 'Posting title', minLen: 3, maxLen: 20, section: 'Application', tooltip: 'Alphabets and spaces only, 3-20 characters' },
+      // Stored as Job_Posting_ID (id), resolved via LOV to show Posting_Title
+      { key: 'Job_Posting_ID', label: 'Posting title', type: 'lov', lovEndpoint: 'job-postings', labelFn: o => o.Posting_Title || o.id, section: 'Application', tooltip: 'Auto-filled from selected application; still editable.' },
       { key: 'Aadhar_Card_Number', label: 'Aadhaar number', required: true, section: 'Documents', tooltip: 'Exactly 12 digits' },
       { key: 'PAN_Card_Number', label: 'PAN card number', required: true, section: 'Documents', tooltip: 'Format: AAAAA0000A' },
       { key: 'Resume_Upload', label: 'Resume upload', type: 'file', accept: '.pdf,.doc,.docx', section: 'Documents', tooltip: 'PDF, DOC, DOCX only' },

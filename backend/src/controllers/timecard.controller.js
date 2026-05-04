@@ -21,7 +21,11 @@ exports.list = (req, res) => {
       const lq = req.query.q.toLowerCase();
       all = all.filter(x => ['HRMS_employee_id', 'attendance_status'].some(f => String(x[f] ?? '').toLowerCase().includes(lq)));
     }
-    const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder']);
+    if (req.query.employee_id) {
+      const eid = String(req.query.employee_id).toLowerCase();
+      all = all.filter(x => String(x?.HRMS_employee_id ?? '').toLowerCase() === eid);
+    }
+    const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder', 'employee_id']);
     Object.entries(req.query).forEach(([k, v]) => {
       if (!skip.has(k) && v) {
         const vals = Array.isArray(v) ? v : [v];

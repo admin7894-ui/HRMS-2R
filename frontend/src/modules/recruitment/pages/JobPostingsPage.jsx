@@ -8,7 +8,7 @@ export default function JobPostingsPage() {
     filterCols={[{key:'Posting_Status',label:'Status'}]}
     columns={[{key:'Posting_Title',label:'Title'},{key:'Posting_Status',label:'Status',type:'badge'},{key:'Posting_Date',label:'Posted',type:'date'},{key:'Closing_Date',label:'Closing',type:'date'}]}
     fields={[
-      {key:'HRMS_Requisition_ID',label:'Requisition',required:true,type:'lov',lovEndpoint:'requisitions',labelFn:o=>o._displayId||o.id},
+      {key:'HRMS_Requisition_ID',label:'Requisition',required:true,type:'lov',lovEndpoint:'requisitions',labelFn:o=>`${o.Requisition_ID || o._displayId || o.id} – ${o.Position_Name || o._positionName || '—'}`},
       {key:'Posting_Title',label:'Posting title',required:true,minLen:5,maxLen:50},
       {key:'Posting_Description',label:'Description',type:'textarea',maxLen:200},
       {key:'Qualification_Required',label:'Qualification required',required:true,type:'select',options:QUAL},

@@ -41,8 +41,14 @@ const makeController = (table, searchFields = ['id'], codeField = null, nameFiel
         // Show ALL records (active + inactive) - Rule #3
         let all = db[table] || [];
         if (req.query.q) all = searchArr(all, req.query.q, searchFields);
+        // Common filter alias: employee_id -> various employee columns
+        const employeeId = req.query.employee_id;
+        if (employeeId) {
+          const keys = ['HRMS_employee_id', 'HRMS_Employee_ID', 'Employee_ID', 'employee_id'];
+          all = all.filter(x => keys.some(k => String(x?.[k] ?? '').toLowerCase() === String(employeeId).toLowerCase()));
+        }
         // Column filters
-        const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder']);
+        const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder', 'employee_id']);
         Object.entries(req.query).forEach(([k, v]) => {
           if (!skip.has(k) && v) {
             const vals = Array.isArray(v) ? v : [v];
