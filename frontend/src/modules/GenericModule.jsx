@@ -33,20 +33,54 @@ const GenericModule = ({
   const formRef = useRef();
   const crud = crudOf(endpoint);
 
-  useEffect(() => {
-    const lovFields = fields.filter(f => f.lovEndpoint);
+  const loadLovData = useCallback((opts = {}) => {
+    const { context } = opts;
     const masters = ['companies', 'business-types', 'business-groups', 'modules'];
-    const all = [...new Set([...masters, ...lovFields.map(f => f.lovEndpoint).filter(Boolean)])];
-    Promise.all(all.map(ep =>
-      api.get('/' + ep, { params: { limit: 500 } })
+    const lovFields = fields.filter(f => f.lovEndpoint);
+    const allEndpoints = [...new Set([...masters, ...lovFields.map(f => f.lovEndpoint).filter(Boolean)])];
+
+    const companyId = context?.company_id || '';
+    const businessTypeId = context?.business_type_id || context?.Business_Type_ID || '';
+    const businessGroupId = context?.business_group_id || '';
+
+    return Promise.all(allEndpoints.map(ep => {
+      const params = { limit: 500 };
+      // Filter ALL LOV endpoints by org context once Company is selected.
+      // Masters are fetched unfiltered to allow initial selection.
+      if (!masters.includes(ep) && companyId) {
+        params.company_id = companyId;
+        if (businessTypeId) params.business_type_id = businessTypeId;
+        if (businessGroupId) params.business_group_id = businessGroupId;
+      }
+      return api.get('/' + ep, { params })
         .then(r => ({ ep, data: r.data || [] }))
-        .catch(() => ({ ep, data: [] }))
-    )).then(results => {
+        .catch(() => ({ ep, data: [] }));
+    })).then(results => {
       const map = {};
       results.forEach(r => { map[r.ep] = r.data; });
       setLovData(map);
     });
-  }, [JSON.stringify(fields.map(f => f.lovEndpoint))]);
+  }, [fields]);
+
+  // LOV preload (global): re-fetch with org context when selected in modal.
+  useEffect(() => {
+    const context = {
+      company_id: form.company_id,
+      business_type_id: form.business_type_id,
+      Business_Type_ID: form.Business_Type_ID,
+      business_group_id: form.business_group_id,
+    };
+    // When modal is open, keep LOVs scoped to selected org context.
+    // When modal is closed, load unfiltered LOVs for list view / next open.
+    loadLovData({ context: modal ? context : null });
+  }, [
+    modal,
+    form.company_id,
+    form.business_type_id,
+    form.Business_Type_ID,
+    form.business_group_id,
+    loadLovData,
+  ]);
 
   const load = useCallback(async () => {
     setLoading(true);
