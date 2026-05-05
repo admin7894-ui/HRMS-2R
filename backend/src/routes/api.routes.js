@@ -208,7 +208,7 @@ r.get('/requisitions', (req, res) => {
   try {
     let all = db.requisitions || [];
     if (req.query.q) { const lq = req.query.q.toLowerCase(); all = all.filter(x => ['Priority','Requisition_Status'].some(f => String(x[f]??'').toLowerCase().includes(lq))); }
-    const skip = new Set(['q','page','limit','sortBy','sortOrder']);
+    const skip = new Set(['q','page','limit','sortBy','sortOrder','employee_id','HRMS_employee_id']);
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k) && v) { const vals = Array.isArray(v)?v:[v]; all = all.filter(x => vals.some(vv => String(x[k]??'').toLowerCase() === vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir = req.query.sortOrder==='desc'?-1:1; all = [...all].sort((a,b) => String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
     all = all.map(x => ({
@@ -802,7 +802,48 @@ r.post('/advance-recovery-schedules', arsCtrl.create);
 r.put('/advance-recovery-schedules/:id', arsCtrl.update);
 r.delete('/advance-recovery-schedules/:id', arsCtrl.remove);
 r.patch('/advance-recovery-schedules/:id/toggle-status', arsCtrl.toggleStatus);
-wire('user-employees',       'user_employees',       ['Employee_ID']);
+// User employees — enrich with employee/supervisor names and assignment label
+const ueCtrl = makeController('user_employees', ['Employee_ID']);
+r.get('/user-employees', (req, res) => {
+  try {
+    let all = db.user_employees || [];
+    all = applyEmployeeIdFilter(all, req.query.employee_id);
+    if (req.query.q) {
+      const lq = req.query.q.toLowerCase();
+      all = all.filter(x => ['Employee_ID', 'Application_ID', 'Assignment_ID', 'Supervisor_ID']
+        .some(f => String(x[f] ?? '').toLowerCase().includes(lq)));
+    }
+    const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder', 'employee_id']);
+    Object.entries(req.query).forEach(([k, v]) => {
+      if (!skip.has(k) && v) {
+        const vals = Array.isArray(v) ? v : [v];
+        all = all.filter(x => vals.some(vv => String(x[k] ?? '').toLowerCase() === vv.toLowerCase()));
+      }
+    });
+    if (req.query.sortBy) {
+      const dir = req.query.sortOrder === 'desc' ? -1 : 1;
+      all = [...all].sort((a, b) => String(a[req.query.sortBy] ?? '').localeCompare(String(b[req.query.sortBy] ?? ''), undefined, { numeric: true }) * dir);
+    }
+    all = all.map(x => {
+      const emp = (db.employees || []).find(e => e.id === x.Employee_ID);
+      const sup = (db.employees || []).find(e => e.id === x.Supervisor_ID);
+      const asn = (db.assignments || []).find(a => a.id === x.Assignment_ID);
+      return {
+        ...x,
+        _empName: emp ? `${emp.First_Name} ${emp.Last_Name}`.trim() : null,
+        _supName: sup ? `${sup.First_Name} ${sup.Last_Name}`.trim() : null,
+        _asnName: asn ? (asn._displayId || asn.id) : null,
+      };
+    });
+    const pg = Math.max(1, +req.query.page || 1), lim = Math.min(200, +req.query.limit || 10);
+    res.json({ success: true, data: all.slice((pg - 1) * lim, pg * lim), total: all.length, page: pg, limit: lim, pages: Math.ceil(all.length / lim) });
+  } catch (e) { err(res, e.message, 500); }
+});
+r.get('/user-employees/:id', ueCtrl.get);
+r.post('/user-employees', ueCtrl.create);
+r.put('/user-employees/:id', ueCtrl.update);
+r.delete('/user-employees/:id', ueCtrl.remove);
+r.patch('/user-employees/:id/toggle-status', ueCtrl.toggleStatus);
 
 // ── Benefit Plans — special auto-code BP001+ ─────────────────────────────────
 const bpBase = makeController('benefit_plans', ['benefit_plan_name']);

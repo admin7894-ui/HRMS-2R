@@ -9,22 +9,32 @@ function SupervisorAutoFill({ form, setForm }) {
 
   useEffect(() => {
     const eid = form.HRMS_employee_id;
-    if (eid && eid !== prevEmpId.current) {
+    if (!eid) {
+      prevEmpId.current = null;
+      setForm(p => ({ ...p, HRMS_assignment_id: '' }));
+      return;
+    }
+    if (eid !== prevEmpId.current) {
       prevEmpId.current = eid;
-      api.get(`/assignments?HRMS_employee_id=${eid}&limit=1`).then(res => {
-        const asn = res.data?.data?.[0];
-        if (asn) setForm(p => ({ ...p, HRMS_assignment_id: asn.id }));
+      api.get(`/employees/${eid}/assignments`).then(res => {
+        const asn = res?.data?.[0];
+        setForm(p => ({ ...p, HRMS_assignment_id: asn?.id || '' }));
       }).catch(() => {});
     }
   }, [form.HRMS_employee_id, setForm]);
 
   useEffect(() => {
     const sid = form.supervisor_employee_id;
-    if (sid && sid !== prevSupId.current) {
+    if (!sid) {
+      prevSupId.current = null;
+      setForm(p => ({ ...p, supervisor_assignment_id: '' }));
+      return;
+    }
+    if (sid !== prevSupId.current) {
       prevSupId.current = sid;
-      api.get(`/assignments?HRMS_employee_id=${sid}&limit=1`).then(res => {
-        const asn = res.data?.data?.[0];
-        if (asn) setForm(p => ({ ...p, supervisor_assignment_id: asn.id }));
+      api.get(`/employees/${sid}/assignments`).then(res => {
+        const asn = res?.data?.[0];
+        setForm(p => ({ ...p, supervisor_assignment_id: asn?.id || '' }));
       }).catch(() => {});
     }
   }, [form.supervisor_employee_id, setForm]);
@@ -41,9 +51,9 @@ export default function SupervisorsPage() {
     ]}
     fields={[
       {key:'HRMS_employee_id',label:'Employee',required:true,type:'lov',lovEndpoint:'employees',labelFn:o=>`${o.First_Name} ${o.Last_Name}`},
-      {key:'HRMS_assignment_id',label:'Employee assignment name',required:true,type:'lov',lovEndpoint:'assignments',labelFn:o=>o._displayId||o.id,tooltip:'Only shows assignments for selected employee'},
+      {key:'HRMS_assignment_id',label:'Employee assignment name',required:true,type:'lov',lovEndpoint:'assignments',labelFn:o=>o._displayId||o.id,tooltip:'Auto-filled from selected employee assignment ID',readOnly:true},
       {key:'supervisor_employee_id',label:'Supervisor',required:true,type:'lov',lovEndpoint:'employees',labelFn:o=>`${o.First_Name} ${o.Last_Name}`},
-      {key:'supervisor_assignment_id',label:'Supervisor assignment name',type:'lov',lovEndpoint:'assignments',labelFn:o=>o._displayId||o.id},
+      {key:'supervisor_assignment_id',label:'Supervisor assignment name',type:'lov',lovEndpoint:'assignments',labelFn:o=>o._displayId||o.id,tooltip:'Auto-filled from selected supervisor assignment ID',readOnly:true},
     ]}
     extraForm={({ form, setForm }) => <SupervisorAutoFill form={form} setForm={setForm}/>}
   />;

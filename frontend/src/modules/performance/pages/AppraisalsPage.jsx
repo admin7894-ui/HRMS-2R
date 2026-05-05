@@ -10,10 +10,13 @@ function AppraisalAutoFill({ form, setForm, setOptions }) {
     const eid = form.HRMS_employee_id;
     if (eid && eid !== prevEmpId.current) {
       prevEmpId.current = eid;
-      api.get(`/assignments?employee_id=${eid}`).then(res => {
-        const asns = res.data || [];
+      api.get(`/employees/${eid}/assignments`).then(res => {
+        const asns = res?.data || [];
         setOptions(asns.map(a => ({ v: a.id, l: a._displayId || a.id })));
-        setForm(p => ({ ...p, HRMS_assignment_id: asns.length === 1 ? asns[0].id : '' }));
+        const picked = [...asns].sort((a, b) =>
+          String(b.updated_at || b.created_at || '').localeCompare(String(a.updated_at || a.created_at || ''))
+        )[0];
+        setForm(p => ({ ...p, HRMS_assignment_id: picked?.id || '' }));
       }).catch(() => {});
     } else if (!eid && prevEmpId.current) {
       prevEmpId.current = null;
@@ -65,7 +68,7 @@ export default function AppraisalsPage() {
     fields={[
       { key: 'HRMS_appraisal_cycle_id', label: 'Appraisal cycle', type: 'lov', lovEndpoint: 'appraisal-cycles', labelFn: o => o.cycle_name },
       { key: 'HRMS_employee_id', label: 'Employee', required: true, type: 'lov', lovEndpoint: 'employees', labelFn: o => `${o.First_Name} ${o.Last_Name}`, tooltip: 'Shows employee name, not internal code' },
-      { key: 'HRMS_assignment_id', label: 'Assignment', type: 'select', options: asnOptions },
+      { key: 'HRMS_assignment_id', label: 'Assignment', required: true, type: 'select', options: asnOptions, readOnly: true, tooltip: 'Auto-filled from selected employee assignment ID' },
       { key: 'HRMS_template_master_id', label: 'Template', type: 'lov', lovEndpoint: 'template-masters', labelFn: o => o.Template_Name },
       { key: 'review_period', label: 'Review period', type: 'select', options: REVIEW_PERIOD },
       { key: 'reviewer_employee_id', label: 'Reviewer', type: 'lov', lovEndpoint: 'employees', labelFn: o => `${o.First_Name} ${o.Last_Name}` },

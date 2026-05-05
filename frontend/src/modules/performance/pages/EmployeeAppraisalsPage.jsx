@@ -24,14 +24,17 @@ export default function EmployeeAppraisalsPage() {
   const crud = crudOf('employee-appraisals');
 
   useEffect(() => {
-    Promise.all(['companies', 'business-types', 'business-groups', 'modules', 'employees', 'appraisal-cycles'].map(ep =>
-      api.get('/' + ep, { params: { limit: 500 } }).then(r => ({ ep, data: r.data || [] })).catch(() => ({ ep, data: [] }))
-    )).then(rs => {
-      const map = {};
-      rs.forEach(r => { map[r.ep] = r.data; });
-      setLovData(map);
-    });
+    loadLovData();
   }, []);
+
+  useEffect(() => {
+    if (!modal) return;
+    loadLovData({
+      company_id: form.company_id,
+      business_type_id: form.business_type_id || form.Business_Type_ID,
+      business_group_id: form.business_group_id,
+    });
+  }, [modal, form.company_id, form.business_type_id, form.Business_Type_ID, form.business_group_id]);
 
   useEffect(() => {
     load();
@@ -51,9 +54,36 @@ export default function EmployeeAppraisalsPage() {
     }
   };
 
+  const loadLovData = async (context = {}) => {
+    const masters = ['companies', 'business-types', 'business-groups', 'modules'];
+    const endpoints = ['companies', 'business-types', 'business-groups', 'modules', 'employees', 'appraisal-cycles'];
+    try {
+      const rs = await Promise.all(endpoints.map(ep => {
+        const params = { limit: 500 };
+        if (!masters.includes(ep) && context.company_id) {
+          params.company_id = context.company_id;
+          if (context.business_type_id) params.business_type_id = context.business_type_id;
+          if (context.business_group_id) params.business_group_id = context.business_group_id;
+        }
+        return api.get('/' + ep, { params }).then(r => ({ ep, data: r.data || [] })).catch(() => ({ ep, data: [] }));
+      }));
+      const map = {};
+      rs.forEach(r => { map[r.ep] = r.data; });
+      setLovData(map);
+    } catch {
+      setLovData({});
+    }
+  };
+
   const loadKeyAreas = async (existingRatings = null) => {
     try {
-      const r = await api.get('/appraisal-key-areas', { params: { limit: 500 } });
+      const params = { limit: 500 };
+      if (form.company_id) {
+        params.company_id = form.company_id;
+        if (form.business_type_id || form.Business_Type_ID) params.business_type_id = form.business_type_id || form.Business_Type_ID;
+        if (form.business_group_id) params.business_group_id = form.business_group_id;
+      }
+      const r = await api.get('/appraisal-key-areas', { params });
       const areas = (r.data || []).filter(a => a.active_flag !== 'N');
       setKeyAreas(areas);
       setRatings(prev => {
@@ -99,13 +129,24 @@ export default function EmployeeAppraisalsPage() {
 
   const handleChange = e => {
     const { name, value } = e.target;
-    setForm(p => ({ ...p, [name]: value }));
+    setForm(p => {
+      const next = { ...p, [name]: value };
+      if (name === 'company_id') {
+        next.HRMS_employee_id = '';
+        next.HRMS_appraisal_cycle_id = '';
+      }
+      return next;
+    });
     if (name === 'HRMS_employee_id') {
       if (value) loadKeyAreas(editing?.key_area_ratings || null);
       else {
         setKeyAreas([]);
         setRatings({});
       }
+    }
+    if (name === 'company_id') {
+      setKeyAreas([]);
+      setRatings({});
     }
     if (errors[name]) setErrors(p => ({ ...p, [name]: '' }));
   };
