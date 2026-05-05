@@ -46,7 +46,7 @@ export default function ApplicantsPage() {
     filterCols={[{ key: 'Source', label: 'Source' }]}
     columns={[{ key: 'First_Name', label: 'First name' }, { key: 'Last_Name', label: 'Last name' }, { key: 'Email', label: 'Email' }, { key: 'Phone', label: 'Phone' }, { key: 'Source', label: 'Source', type: 'badge' }]}
     fields={[
-      { key: 'HRMS_Application_ID', label: 'Application', type: 'lov', lovEndpoint: 'applications', labelFn: o => `${o.First_Name || ''} ${o.Last_Name || ''}`.trim() || o._applicantName || o.id, section: 'Personal', tooltip: 'Selecting an application auto-fills matching applicant fields.' },
+      { key: 'HRMS_Application_ID', label: 'Application', type: 'lov', lovEndpoint: 'applications', labelFn: o => `${o.First_Name || ''} ${o.Last_Name || ''}`.trim() || o._displayId || o._applicantName || o.Email_ID || o.id, section: 'Personal', tooltip: 'Selecting an application auto-fills matching applicant fields.' },
       { key: 'First_Name', label: 'First name', required: true, minLen: 3, maxLen: 15, section: 'Personal' },
       { key: 'Last_Name', label: 'Last name', required: true, minLen: 3, maxLen: 15, section: 'Personal' },
       { key: 'Email', label: 'Email', required: true, type: 'email', section: 'Personal', tooltip: 'Format: abc@gmail.com' },

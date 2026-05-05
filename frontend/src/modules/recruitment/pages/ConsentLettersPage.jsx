@@ -13,7 +13,7 @@ export default function ConsentLettersPage() {
       {key:'HRMS_Interview_ID',label:'Interview',required:true,type:'lov',lovEndpoint:'interviews',labelFn:o=>`${o.Interview_Code || o._displayId || o.id} – ${o.Applicant_Name || o._applicationName || '—'}`,tooltip:'Shows interview reference'},
       {key:'HRMS_Application_ID',label:'Application',required:true,type:'lov',lovEndpoint:'applications',labelFn:o=>`${o.First_Name} ${o.Last_Name}`},
       {key:'HRMS_Requisition_ID',label:'Requisition',required:true,type:'lov',lovEndpoint:'requisitions',labelFn:o=>`${o.Requisition_Code || o.Requisition_ID || o._displayId || o.id} – ${o.Position_Name || o._positionName || '—'}`,tooltip:'Shows requisition reference'},
-      {key:'HRMS_Template_Assignment_ID',label:'Template assignment',required:true,type:'lov',lovEndpoint:'template-assignments',labelFn:o=>o._displayId||o.id},
+      {key:'HRMS_Template_Assignment_ID',label:'Template assignment',required:true,type:'lov',lovEndpoint:'template-assignments',labelFn:o=>`${o._displayId||o.id} – ${o._applicantName || o.Employee_Name || o._empName || '—'}`},
       {key:'Consent_Letter_Signed',label:'Consent signed',required:true,type:'select',options:[{v:'Y',l:'Yes'},{v:'N',l:'No'}]},
     ]}
     extraForm={({ form, setForm }) => {

@@ -9,8 +9,37 @@ const { genId } = require('../utils/idGen');
 r.post('/apply', (req, res) => {
   try {
     const now = new Date().toISOString().split('T')[0];
+    const selectedCompany = (db.companies || []).find(c =>
+      [c.id, c.Company_ID, c._displayId, c.Company_Name]
+        .filter(Boolean)
+        .map(v => String(v).toLowerCase())
+        .includes(String(req.body.company_id || req.body.Company_ID || '').toLowerCase())
+    );
+    const normalizedCompanyId = selectedCompany?.id || req.body.company_id || req.body.Company_ID || null;
+    const contextBusinessTypeId =
+      req.body.business_type_id ||
+      req.body.Business_Type_ID ||
+      selectedCompany?.Business_Type_ID ||
+      null;
+    const contextBusinessGroupId =
+      req.body.business_group_id ||
+      req.body.Business_Group_ID ||
+      (db.business_groups || []).find(bg => bg.Company_ID === normalizedCompanyId)?.id ||
+      null;
+    const contextModuleId =
+      req.body.module_id ||
+      req.body.Module_ID ||
+      'MOD1';
     const record = {
       ...req.body,
+      company_id:          normalizedCompanyId,
+      Company_ID:          normalizedCompanyId,
+      business_type_id:    contextBusinessTypeId,
+      Business_Type_ID:    contextBusinessTypeId,
+      business_group_id:   contextBusinessGroupId,
+      Business_Group_ID:   contextBusinessGroupId,
+      module_id:           contextModuleId,
+      Module_ID:           contextModuleId,
       _displayId:          genId('APP', 'applications'),
       Application_Status:  req.body.Application_Status || 'APPLIED',
       Applied_Date:        now,

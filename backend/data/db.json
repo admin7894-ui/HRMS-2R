@@ -59,7 +59,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "MOD001"
     },
     {
       "id": "MOD2",
@@ -76,7 +77,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "MOD002"
     },
     {
       "id": "MOD3",
@@ -93,7 +95,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "MOD003"
     },
     {
       "id": "MOD4",
@@ -110,7 +113,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "MOD004"
     },
     {
       "id": "MOD5",
@@ -127,7 +131,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "MOD005"
     }
   ],
   "business_types": [
@@ -146,7 +151,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "BT001"
     },
     {
       "id": "BT2",
@@ -163,7 +169,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "BT002"
     },
     {
       "id": "BT3",
@@ -180,7 +187,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "BT003"
     },
     {
       "id": "BT4",
@@ -199,7 +207,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "BT004"
     },
     {
       "id": "BT5",
@@ -218,7 +227,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "BT005"
     }
   ],
   "companies": [
@@ -244,7 +254,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "CO001"
     },
     {
       "id": "C2",
@@ -268,7 +279,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "CO002"
     }
   ],
   "locations": [
@@ -293,7 +305,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "LOC001"
     },
     {
       "id": "L2",
@@ -316,7 +329,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "LOC002"
     }
   ],
   "business_groups": [
@@ -337,7 +351,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "BG001"
     },
     {
       "id": "BG2",
@@ -356,7 +371,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "BG002"
     },
     {
       "id": "BG3",
@@ -375,7 +391,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "BG003"
     },
     {
       "id": "BG4",
@@ -394,7 +411,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "BG004"
     }
   ],
   "departments": [
@@ -413,7 +431,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "DEPT001"
     },
     {
       "id": "D2",
@@ -430,7 +449,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "DEPT002"
     },
     {
       "id": "D3",
@@ -447,7 +467,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "DEPT003"
     },
     {
       "id": "D4",
@@ -464,7 +485,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "DEPT004"
     },
     {
       "id": "D5",
@@ -481,7 +503,62 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "DEPT005"
+    },
+    {
+      "id": "D6",
+      "Department_ID": "D6",
+      "Department_Name": "Product Engineering",
+      "Module_ID": "MOD1",
+      "company_id": "C2",
+      "business_group_id": "BG3",
+      "business_type_id": "BT1",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": null,
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "created_at": "2026-05-05T06:15:00.000Z",
+      "updated_at": "2026-05-05T06:15:00.000Z",
+      "_displayId": "DEPT006"
+    },
+    {
+      "id": "D7",
+      "Department_ID": "D7",
+      "Department_Name": "Quality Assurance",
+      "Module_ID": "MOD1",
+      "company_id": "C2",
+      "business_group_id": "BG3",
+      "business_type_id": "BT1",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": null,
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "created_at": "2026-05-05T06:16:00.000Z",
+      "updated_at": "2026-05-05T06:16:00.000Z",
+      "_displayId": "DEPT007"
+    },
+    {
+      "id": "D8",
+      "Department_ID": "D8",
+      "Department_Name": "People Operations",
+      "Module_ID": "MOD1",
+      "company_id": "C2",
+      "business_group_id": "BG3",
+      "business_type_id": "BT1",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": null,
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "created_at": "2026-05-05T06:17:00.000Z",
+      "updated_at": "2026-05-05T06:17:00.000Z",
+      "_displayId": "DEPT008"
     }
   ],
   "roles": [
@@ -500,7 +577,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "ROLE001"
     },
     {
       "id": "R2",
@@ -517,7 +595,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "ROLE002"
     },
     {
       "id": "R3",
@@ -534,7 +613,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "ROLE003"
     },
     {
       "id": "R4",
@@ -551,7 +631,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "ROLE004"
     }
   ],
   "designations": [
@@ -570,7 +651,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "DESIG001"
     },
     {
       "id": "DG2",
@@ -587,7 +669,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "DESIG002"
     },
     {
       "id": "DG3",
@@ -604,7 +687,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "DESIG003"
     },
     {
       "id": "DG4",
@@ -621,7 +705,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "DESIG004"
     }
   ],
   "security_profiles": [
@@ -642,7 +727,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "SP001"
     },
     {
       "id": "SP2",
@@ -661,7 +747,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "SP002"
     }
   ],
   "profile_accesses": [
@@ -683,7 +770,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "PA001"
     },
     {
       "id": "PA2",
@@ -703,7 +791,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.846Z",
-      "updated_at": "2026-05-04T10:07:38.846Z"
+      "updated_at": "2026-05-04T10:07:38.846Z",
+      "_displayId": "PA002"
     }
   ],
   "security_roles": [
@@ -727,7 +816,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.868Z",
-      "updated_at": "2026-05-04T10:07:38.868Z"
+      "updated_at": "2026-05-04T10:07:38.868Z",
+      "_displayId": "SR001"
     },
     {
       "id": "SR2",
@@ -749,7 +839,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "SR002"
     }
   ],
   "table_accesses": [
@@ -774,7 +865,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "TA001"
     },
     {
       "id": "TA2",
@@ -797,7 +889,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "TA002"
     }
   ],
   "salary_amounts": [
@@ -820,7 +913,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "SAL002"
     },
     {
       "id": "SA2",
@@ -841,7 +935,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "SAL003"
     },
     {
       "id": "SA3",
@@ -862,7 +957,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "SAL004"
     },
     {
       "id": "SA4",
@@ -883,7 +979,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "SAL005"
     },
     {
       "id": "12600af7-505d-49ee-8994-e65eff4d7ea7",
@@ -899,7 +996,7 @@
       "updated_by": "admin@hrms.com",
       "Salary_Amount": "32000",
       "Currency_Code": "INR",
-      "_displayId": "SAL001",
+      "_displayId": "SAL006",
       "created_at": "2026-05-04T10:10:22.231Z",
       "updated_at": "2026-05-04T10:10:22.231Z"
     },
@@ -915,11 +1012,11 @@
       "effective_to": "",
       "created_by": "admin@hrms.com",
       "updated_by": "admin@hrms.com",
-      "Salary_Amount": "32000",
+      "Salary_Amount": "35000",
       "Currency_Code": "INR",
-      "_displayId": "SAL001",
+      "_displayId": "SAL007",
       "created_at": "2026-05-04T10:25:18.033Z",
-      "updated_at": "2026-05-04T10:25:18.033Z"
+      "updated_at": "2026-05-05T06:06:26.597Z"
     },
     {
       "id": "5ffd153a-c84c-4211-85f4-ac2a66312940",
@@ -935,7 +1032,7 @@
       "updated_by": "admin@hrms.com",
       "Salary_Amount": "72000",
       "Currency_Code": "INR",
-      "_displayId": "SAL001",
+      "_displayId": "SAL008",
       "created_at": "2026-05-04T10:28:33.485Z",
       "updated_at": "2026-05-04T10:28:33.486Z"
     }
@@ -959,7 +1056,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "SRANG002"
     },
     {
       "id": "SR_2",
@@ -979,7 +1077,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "SRANG003"
     },
     {
       "id": "SR_3",
@@ -999,7 +1098,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "SRANG004"
     },
     {
       "id": "c81c6a2d-7a6e-4991-a236-ad2c62ccebb7",
@@ -1016,7 +1116,7 @@
       "Minimum_Salary": "17999",
       "Maximum_Salary": "29999",
       "Currency_Code": "INR",
-      "_displayId": "SRANG001",
+      "_displayId": "SRANG005",
       "created_at": "2026-05-04T10:10:42.582Z",
       "updated_at": "2026-05-04T10:10:42.583Z"
     },
@@ -1035,7 +1135,7 @@
       "Minimum_Salary": "25000",
       "Maximum_Salary": "80000",
       "Currency_Code": "INR",
-      "_displayId": "SRANG001",
+      "_displayId": "SRANG006",
       "created_at": "2026-05-04T10:29:11.111Z",
       "updated_at": "2026-05-04T10:29:11.111Z"
     }
@@ -1062,7 +1162,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "GRD002"
     },
     {
       "id": "G2",
@@ -1085,7 +1186,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "GRD003"
     },
     {
       "id": "G3",
@@ -1108,7 +1210,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "GRD004"
     },
     {
       "id": "G4",
@@ -1131,7 +1234,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "GRD005"
     },
     {
       "id": "fa915c2c-daae-4ce0-af3c-a6d66319a048",
@@ -1148,7 +1252,7 @@
       "Grade_Name": "Jun Grade",
       "Grade_Code": "JUN_GRADE",
       "Min_Salary": "c81c6a2d-7a6e-4991-a236-ad2c62ccebb7",
-      "_displayId": "GRD001",
+      "_displayId": "GRD006",
       "created_at": "2026-05-04T10:23:31.524Z",
       "updated_at": "2026-05-04T10:23:31.524Z"
     },
@@ -1167,7 +1271,7 @@
       "Grade_Name": "Mid Grade",
       "Grade_Code": "MID_GRADE",
       "Min_Salary": "c81c6a2d-7a6e-4991-a236-ad2c62ccebb7",
-      "_displayId": "GRD001",
+      "_displayId": "GRD007",
       "created_at": "2026-05-04T10:24:07.606Z",
       "updated_at": "2026-05-04T10:24:07.606Z"
     }
@@ -1194,7 +1298,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "GSTEP002"
     },
     {
       "id": "GS2",
@@ -1217,7 +1322,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "GSTEP003"
     },
     {
       "id": "GS3",
@@ -1240,7 +1346,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "GSTEP004"
     },
     {
       "id": "ed897eb3-e583-4a0c-9f65-af38fca3554e",
@@ -1258,7 +1365,7 @@
       "Step_Number": "3",
       "Step_Name": "step six",
       "Step_Amount": "32000",
-      "_displayId": "GSTEP001",
+      "_displayId": "GSTEP005",
       "created_at": "2026-05-04T10:27:09.260Z",
       "updated_at": "2026-05-04T10:27:09.260Z"
     },
@@ -1278,7 +1385,7 @@
       "Step_Number": "4",
       "Step_Name": "step five",
       "Step_Amount": "50000",
-      "_displayId": "GSTEP001",
+      "_displayId": "GSTEP006",
       "created_at": "2026-05-04T10:27:40.201Z",
       "updated_at": "2026-05-04T10:27:40.201Z"
     }
@@ -1306,7 +1413,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "GLDR002"
     },
     {
       "id": "GL2",
@@ -1330,7 +1438,29 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "GLDR003"
+    },
+    {
+      "id": "bc3e6fa3-8d73-4f51-b4c7-0585854a439b",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-04",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "Ladder_Name": "Ladder-1",
+      "HRMS_From_Grade_ID": "fa915c2c-daae-4ce0-af3c-a6d66319a048",
+      "HRMS_To_Grade_ID": "2d95ca58-6945-4ecc-9677-83a05b4ae9b1",
+      "Sequence": "4",
+      "Min_Years_in_Grade": "1",
+      "_displayId": "GLDR001",
+      "created_at": "2026-05-04T12:23:36.915Z",
+      "updated_at": "2026-05-04T12:23:36.915Z"
     }
   ],
   "jobs": [
@@ -1354,7 +1484,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "JOB002"
     },
     {
       "id": "J2",
@@ -1376,7 +1507,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "JOB003"
     },
     {
       "id": "J3",
@@ -1398,7 +1530,64 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "JOB004"
+    },
+    {
+      "id": "26c0294d-71f7-4108-a082-053396af9569",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-04",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "Job_Name": "web devops",
+      "Job_Code": "WEB_DEVOPS",
+      "Description": "jhgfgdxfzdxgyuio",
+      "_displayId": "JOB001",
+      "created_at": "2026-05-04T12:24:01.622Z",
+      "updated_at": "2026-05-04T12:24:01.622Z"
+    },
+    {
+      "id": "24f88b0f-bea1-4a94-97c6-b686942e3aeb",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "Job_Name": "Manual Tester",
+      "Job_Code": "MANUAL_TESTER",
+      "Description": "aasdgfgjkuii",
+      "_displayId": "JOB005",
+      "created_at": "2026-05-05T06:09:24.705Z",
+      "updated_at": "2026-05-05T06:09:24.705Z"
+    },
+    {
+      "id": "3f10d771-7729-4fcf-a1ce-ffb814b91a75",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "Job_Name": "Accountant",
+      "Job_Code": "ACCOUNTANT",
+      "_displayId": "JOB006",
+      "created_at": "2026-05-05T06:13:48.729Z",
+      "updated_at": "2026-05-05T06:13:48.729Z"
     }
   ],
   "positions": [
@@ -1423,7 +1612,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "POS002"
     },
     {
       "id": "P2",
@@ -1446,7 +1636,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "POS003"
     },
     {
       "id": "P3",
@@ -1469,7 +1660,123 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "POS004"
+    },
+    {
+      "id": "20548beb-14e6-4470-8872-8705c5cd474f",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-04",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "Position_Name": "Devops Engineer",
+      "HRMS_Job_ID": "26c0294d-71f7-4108-a082-053396af9569",
+      "HRMS_Grade_ID": "fa915c2c-daae-4ce0-af3c-a6d66319a048",
+      "Headcount": 2,
+      "_displayId": "POS001",
+      "created_at": "2026-05-04T12:27:18.814Z",
+      "updated_at": "2026-05-04T12:27:18.814Z"
+    },
+    {
+      "id": "P4",
+      "HRMS_Position_ID": "P4",
+      "Company_ID": "C2",
+      "Business_Group_ID": "BG3",
+      "Business_Type_ID": "BT1",
+      "Module_ID": "MOD1",
+      "HRMS_Job_ID": "26c0294d-71f7-4108-a082-053396af9569",
+      "HRMS_Grade_ID": "fa915c2c-daae-4ce0-af3c-a6d66319a048",
+      "HRMS_Department_ID": "D6",
+      "Position_Name": "Associate Product Engineer",
+      "Headcount": 6,
+      "company_id": "C2",
+      "business_group_id": "BG3",
+      "business_type_id": "BT1",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": null,
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "created_at": "2026-05-05T06:20:00.000Z",
+      "updated_at": "2026-05-05T06:20:00.000Z",
+      "_displayId": "POS005"
+    },
+    {
+      "id": "P5",
+      "HRMS_Position_ID": "P5",
+      "Company_ID": "C2",
+      "Business_Group_ID": "BG3",
+      "Business_Type_ID": "BT1",
+      "Module_ID": "MOD1",
+      "HRMS_Job_ID": "26c0294d-71f7-4108-a082-053396af9569",
+      "HRMS_Grade_ID": "fa915c2c-daae-4ce0-af3c-a6d66319a048",
+      "HRMS_Department_ID": "D7",
+      "Position_Name": "QA Automation Engineer",
+      "Headcount": 4,
+      "company_id": "C2",
+      "business_group_id": "BG3",
+      "business_type_id": "BT1",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": null,
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "created_at": "2026-05-05T06:21:00.000Z",
+      "updated_at": "2026-05-05T06:21:00.000Z",
+      "_displayId": "POS006"
+    },
+    {
+      "id": "P6",
+      "HRMS_Position_ID": "P6",
+      "Company_ID": "C2",
+      "Business_Group_ID": "BG3",
+      "Business_Type_ID": "BT1",
+      "Module_ID": "MOD1",
+      "HRMS_Job_ID": "26c0294d-71f7-4108-a082-053396af9569",
+      "HRMS_Grade_ID": "fa915c2c-daae-4ce0-af3c-a6d66319a048",
+      "HRMS_Department_ID": "D8",
+      "Position_Name": "HR Business Partner",
+      "Headcount": 2,
+      "company_id": "C2",
+      "business_group_id": "BG3",
+      "business_type_id": "BT1",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": null,
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "created_at": "2026-05-05T06:22:00.000Z",
+      "updated_at": "2026-05-05T06:22:00.000Z",
+      "_displayId": "POS007"
+    },
+    {
+      "id": "0dad17f9-4242-4efd-8906-3a9447b620b2",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_Job_ID": "3f10d771-7729-4fcf-a1ce-ffb814b91a75",
+      "Position_Name": "IT Accountant",
+      "HRMS_Grade_ID": "fa915c2c-daae-4ce0-af3c-a6d66319a048",
+      "Headcount": 1,
+      "_displayId": "POS008",
+      "created_at": "2026-05-05T06:18:59.533Z",
+      "updated_at": "2026-05-05T06:18:59.533Z"
     }
   ],
   "work_schedules": [
@@ -1497,7 +1804,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "WS002"
     },
     {
       "id": "WS2",
@@ -1523,7 +1831,54 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "WS003"
+    },
+    {
+      "id": "5c7aabf2-1c87-4064-a17b-7fdbf9bc2835",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-04",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "Work_Schedule_Name": "Mid-Day Shift",
+      "Work_Schedule_Code": "MIDDAY_SHIFT",
+      "Shift_Start": "13:00",
+      "Shift_End": "23:00",
+      "Break_Minutes": "20",
+      "Working_Hours": "3",
+      "Applicable_Days": "Mon,Tue,Wed",
+      "_displayId": "WS001",
+      "created_at": "2026-05-04T12:31:07.572Z",
+      "updated_at": "2026-05-04T12:31:07.573Z"
+    },
+    {
+      "id": "1a0a2897-8f10-4c74-a008-92fc32b28888",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "Work_Schedule_Name": "Night Shift",
+      "Work_Schedule_Code": "NIGHT_SHIFT",
+      "Shift_Start": "17:00",
+      "Shift_End": "02:00",
+      "Break_Minutes": "30",
+      "Working_Hours": "8",
+      "Applicable_Days": "Mon,Tue,Wed",
+      "_displayId": "WS004",
+      "created_at": "2026-05-05T06:20:14.290Z",
+      "updated_at": "2026-05-05T06:20:14.290Z"
     }
   ],
   "assignment_statuses": [
@@ -1548,7 +1903,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "AST002"
     },
     {
       "id": "AS2",
@@ -1571,7 +1927,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "AST003"
     },
     {
       "id": "AS3",
@@ -1594,7 +1951,48 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "AST004"
+    },
+    {
+      "id": "d6581031-ded7-4b53-8784-bf04872b038d",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-04",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "Status_Name": "Active",
+      "Status_Code": "ACTIVE",
+      "User_Status": "WORKING",
+      "System_Status": "ACTIVE",
+      "_displayId": "AST005",
+      "created_at": "2026-05-04T12:31:31.886Z",
+      "updated_at": "2026-05-04T12:31:31.886Z"
+    },
+    {
+      "id": "cf8e2bbf-46eb-4eba-9017-cccfb530975a",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-04",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "Status_Name": "Probation",
+      "Status_Code": "PROBATION",
+      "User_Status": "ON_PROBATION",
+      "System_Status": "PROBATION",
+      "_displayId": "AST006",
+      "created_at": "2026-05-04T12:31:45.627Z",
+      "updated_at": "2026-05-04T12:31:45.627Z"
     }
   ],
   "requisitions": [
@@ -1623,7 +2021,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "REQ002"
     },
     {
       "id": "RQ2",
@@ -1650,7 +2049,83 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "REQ003"
+    },
+    {
+      "id": "cf725ea4-fd11-49bb-9d4e-462ac7fd19a5",
+      "company_id": "C1",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG1",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-04",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_Position_ID": "P1",
+      "Vacancy_Count": "2",
+      "HRMS_Department_ID": "D1",
+      "Requested_By_Employee_ID": "E2",
+      "Requisition_Status": "OPEN",
+      "Priority": "MEDIUM",
+      "Qualification_Required": "M.A",
+      "Raised_Date": "2026-05-04",
+      "Target_Closed_Date": "2026-05-15",
+      "_displayId": "REQ004",
+      "created_at": "2026-05-04T12:32:58.961Z",
+      "updated_at": "2026-05-04T12:32:58.961Z"
+    },
+    {
+      "id": "1235066b-df58-40dd-90d6-f2b9406a435d",
+      "company_id": "C1",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG1",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_Department_ID": "D3",
+      "HRMS_Position_ID": "P1",
+      "Requested_By_Employee_ID": "E2",
+      "Vacancy_Count": "2",
+      "Priority": "HIGH",
+      "Requisition_Status": "OPEN",
+      "Qualification_Required": "PhD",
+      "Raised_Date": "2026-05-01",
+      "Target_Closed_Date": "2026-05-13",
+      "_displayId": "REQ005",
+      "created_at": "2026-05-05T04:42:12.566Z",
+      "updated_at": "2026-05-05T04:42:12.566Z"
+    },
+    {
+      "id": "f31d5ccc-01ed-46fc-9fda-708d7ce2ea7d",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_Department_ID": "D6",
+      "HRMS_Position_ID": "0dad17f9-4242-4efd-8906-3a9447b620b2",
+      "Requested_By_Employee_ID": "E4",
+      "Vacancy_Count": "2",
+      "Priority": "HIGH",
+      "Requisition_Status": "OPEN",
+      "Qualification_Required": "M.A",
+      "Raised_Date": "2026-05-05",
+      "Target_Closed_Date": "2026-05-21",
+      "_displayId": "REQ006",
+      "created_at": "2026-05-05T06:21:06.336Z",
+      "updated_at": "2026-05-05T06:21:06.336Z"
     }
   ],
   "job_postings": [
@@ -1682,7 +2157,62 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "JP002"
+    },
+    {
+      "id": "6fea4d91-473c-4ba0-9372-15ed79168771",
+      "company_id": "C1",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG1",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_Requisition_ID": "1235066b-df58-40dd-90d6-f2b9406a435d",
+      "Posting_Title": "Data Analyst",
+      "Posting_Description": "dxfg jasbddsa sabdwjsa dwbaj",
+      "Qualification_Required": "M.Com",
+      "Experience_Years_Min": "0",
+      "Experience_Years_Max": "3",
+      "Salary_Range_Min": "SA1",
+      "Salary_Range_Max": "SA3",
+      "Posting_Date": "2026-05-01",
+      "Closing_Date": "2026-05-13",
+      "Posting_Status": "OPEN",
+      "_displayId": "JP001",
+      "created_at": "2026-05-05T04:43:43.862Z",
+      "updated_at": "2026-05-05T04:43:43.862Z"
+    },
+    {
+      "id": "e38da60c-0d47-44a1-a023-50708960ec4e",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_Requisition_ID": "f31d5ccc-01ed-46fc-9fda-708d7ce2ea7d",
+      "Posting_Title": "IT Accountant",
+      "Posting_Description": "adsfgfhhjkjljgjfhdgsfda",
+      "Qualification_Required": "M.Tech / M.E",
+      "Experience_Years_Min": "1",
+      "Experience_Years_Max": "4",
+      "Salary_Range_Min": "7f4482ee-b737-41bd-a8db-04feb1d5f128",
+      "Salary_Range_Max": "5ffd153a-c84c-4211-85f4-ac2a66312940",
+      "Posting_Date": "2026-05-05",
+      "Closing_Date": "2026-05-28",
+      "Posting_Status": "OPEN",
+      "_displayId": "JP003",
+      "created_at": "2026-05-05T06:22:45.292Z",
+      "updated_at": "2026-05-05T06:22:45.292Z"
     }
   ],
   "applicants": [
@@ -1712,7 +2242,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "APL001"
     },
     {
       "id": "AP2",
@@ -1740,7 +2271,38 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "APL002"
+    },
+    {
+      "id": "53532899-888a-4433-9577-f05fcf826386",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_Application_ID": "9a192457-65a1-42a2-8f37-ce2ddad8a248",
+      "First_Name": "Kiran ",
+      "Last_Name": "Patel",
+      "Email": "kiran@gmail.com",
+      "Phone": "7845868556",
+      "Date_of_Birth": "1999-07-28",
+      "Source": "PORTAL",
+      "Job_Posting_ID": "e38da60c-0d47-44a1-a023-50708960ec4e",
+      "Aadhar_Card_Number": "874896748965",
+      "PAN_Card_Number": "ABCDE1234F",
+      "Aadhar_Card_Upload": "134067015797740348.jpg",
+      "PAN_Card_Upload": "134067015797740348.jpg",
+      "Passport_Size_Upload": "client ER.jpg",
+      "_displayId": "APL003",
+      "created_at": "2026-05-05T06:01:35.635Z",
+      "updated_at": "2026-05-05T06:24:24.840Z",
+      "Resume_Upload": "HRMS_ERD_Final 2.pdf"
     }
   ],
   "applications": [
@@ -1770,7 +2332,136 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "APP002"
+    },
+    {
+      "id": "9a192457-65a1-42a2-8f37-ce2ddad8a248",
+      "company_id": "C2",
+      "First_Name": "Kiran ",
+      "Last_Name": "Patel",
+      "Middle_Name": "Vishwanath",
+      "Date_of_Birth": "1999-07-28",
+      "Gender": "MALE",
+      "Marital_Status": "SINGLE",
+      "Nationality": "Indian",
+      "Email_ID": "kiran@gmail.com",
+      "Phone_Number": "7845868556",
+      "Alternate_Phone": "8754856748",
+      "Emergency_Contact_Name": "Jiya",
+      "Emergency_Contact_Number": "8574896574",
+      "Address_Line1": "asdhqa ashdqwbhas dqwasdbqw dqwbdqwj das, bhsabujhwbq",
+      "Address_Line2": "wqsabdhwqs",
+      "City": "Chandrapur",
+      "State": "Maharashtra",
+      "Country": "India",
+      "Pincode": "442401",
+      "Aadhaar_Number": "874896748965",
+      "PAN_Number": "ABCDE1234F",
+      "Aadhaar_File": "134067015797740348.jpg",
+      "PAN_File": "134067015797740348.jpg",
+      "Photo_File": "client ER.jpg",
+      "Other_Doc_File": "client ER.jpg",
+      "Qualification": "B.Tech / B.E",
+      "Degree_Name": "Computer",
+      "Specialization": "Information Technology",
+      "University_Name": "RTMNU",
+      "Institute_Name": "iiqanjs hsabddjsabwqjsa",
+      "Edu_Start_Year": "2017",
+      "Edu_End_Year": "2021",
+      "Passing_Year": "2021",
+      "Percentage": "87",
+      "Edu_Grade": "B",
+      "Is_Fresher": false,
+      "Prev_Company_Name": "yqhsvqsabs",
+      "Prev_Designation": "awefsdgfhg",
+      "Prev_Department": "gsrdghfhgjm",
+      "Industry_Type": "qewredtghfg",
+      "Exp_Start_Date": "2026-05-04",
+      "Exp_End_Date": "2026-06-04",
+      "Total_Experience": "2",
+      "Last_Drawn_Salary": "600000",
+      "Reason_For_Leaving": "lkfdfsftghuijokphjjvn h hjnbhknmn ",
+      "Nominee_Name": "kjlkhgfdxcghjk",
+      "Nominee_Relationship": "Mother",
+      "Nominee_Date_of_Birth": "2026-05-04",
+      "Nominee_Contact_Number": "9858964186",
+      "HRMS_Job_Posting_ID": "JP1",
+      "Expected_Salary": "85465",
+      "Source": "PORTAL",
+      "Applied_Date": "2026-05-04",
+      "Application_Status": "APPLIED",
+      "_displayId": "APP003",
+      "active_flag": "Y",
+      "Effective_From": "2026-05-04",
+      "Created_By": "portal",
+      "Updated_By": "portal",
+      "created_at": "2026-05-04T12:39:54.804Z",
+      "updated_at": "2026-05-04T12:39:54.804Z"
+    },
+    {
+      "id": "5196c0a9-9e46-4f59-8cf0-64eb8a2b5d3a",
+      "company_id": "C1",
+      "First_Name": "Vaibhav ",
+      "Last_Name": "Pawar",
+      "Middle_Name": "Ritesh",
+      "Date_of_Birth": "2019-02-05",
+      "Gender": "MALE",
+      "Marital_Status": "SINGLE",
+      "Nationality": "Indian",
+      "Email_ID": "vaibhav@gmail.com",
+      "Phone_Number": "8784512685",
+      "Alternate_Phone": "8879865418",
+      "Emergency_Contact_Name": "Shrutika",
+      "Emergency_Contact_Number": "9749865749",
+      "Address_Line1": "wfavuwghsabd whdnsbad wdjanbjk",
+      "Address_Line2": "ufyaduhb wsadkjj jsdnwojksnd,",
+      "City": "Nagpur",
+      "State": "Maharashtra",
+      "Country": "India",
+      "Pincode": "442462",
+      "Aadhaar_Number": "897489654165",
+      "PAN_Number": "ABCDE1234F",
+      "Aadhaar_File": "134067015797740348.jpg",
+      "PAN_File": "134067015797740348.jpg",
+      "Photo_File": "client ER.jpg",
+      "Other_Doc_File": "client ER.jpg",
+      "Qualification": "M.Com",
+      "Degree_Name": "Commerece",
+      "Specialization": "Commerce",
+      "University_Name": "RTMNU",
+      "Institute_Name": "nnasbd hsnbd asdhnbws",
+      "Edu_Start_Year": "2016",
+      "Edu_End_Year": "2020",
+      "Passing_Year": "2020",
+      "Percentage": "95",
+      "Edu_Grade": "A",
+      "Is_Fresher": true,
+      "Prev_Company_Name": "",
+      "Prev_Designation": "",
+      "Prev_Department": "",
+      "Industry_Type": "",
+      "Exp_Start_Date": "",
+      "Exp_End_Date": "",
+      "Total_Experience": "",
+      "Last_Drawn_Salary": "",
+      "Reason_For_Leaving": "",
+      "Nominee_Name": "waefsrgdthfyg",
+      "Nominee_Relationship": "Sister",
+      "Nominee_Date_of_Birth": "2008-07-05",
+      "Nominee_Contact_Number": "9887485641",
+      "HRMS_Job_Posting_ID": "JP1",
+      "Expected_Salary": "50000",
+      "Source": "LINKEDIN",
+      "Applied_Date": "2026-05-05",
+      "Application_Status": "APPLIED",
+      "_displayId": "APP004",
+      "active_flag": "Y",
+      "Effective_From": "2026-05-05",
+      "Created_By": "portal",
+      "Updated_By": "portal",
+      "created_at": "2026-05-05T04:20:28.611Z",
+      "updated_at": "2026-05-05T04:20:28.611Z"
     }
   ],
   "interviews": [
@@ -1799,7 +2490,32 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "INT001"
+    },
+    {
+      "id": "006617cd-44a6-4eba-bb2c-d8624252a7a1",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_Application_ID": "9a192457-65a1-42a2-8f37-ce2ddad8a248",
+      "Interview_Round": "2",
+      "Interview_Date": "2026-05-05T13:00",
+      "Interview_Employee_ID": "E4",
+      "Interview_Mode": "OFFLINE",
+      "Interview_Status": "COMPLETED",
+      "Rating": "4",
+      "Feedback": "good",
+      "_displayId": "INT002",
+      "created_at": "2026-05-05T06:25:03.010Z",
+      "updated_at": "2026-05-05T06:25:03.010Z"
     }
   ],
   "template_masters": [
@@ -1825,7 +2541,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "TMP002"
     },
     {
       "id": "TM2",
@@ -1849,7 +2566,68 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "TMP003"
+    },
+    {
+      "id": "07454b4c-8be7-40a8-992d-368fa36d803c",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "Template_Name": "Offer Letter 2026",
+      "Template_Code": "OFFER_LETTER_2026",
+      "Template_Type": "OFFER_LETTER",
+      "Description": "adsfgh",
+      "_displayId": "TMP004",
+      "created_at": "2026-05-05T04:47:20.234Z",
+      "updated_at": "2026-05-05T04:47:20.234Z"
+    },
+    {
+      "id": "14200a9d-3bb8-4f11-9c85-c2c60a5d3209",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "Template_Name": "Consent Letter 2026",
+      "Template_Code": "CONSENT_LETTER_2026",
+      "Description": "wqertrgrdfrdfdsssssssssssssddddddddddddddddddddddddddwas",
+      "Template_Type": "CONSENT",
+      "_displayId": "TMP005",
+      "created_at": "2026-05-05T04:47:55.677Z",
+      "updated_at": "2026-05-05T04:47:55.677Z"
+    },
+    {
+      "id": "d2504261-ba48-4a59-b8a3-4e3c8746f1d7",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "Template_Name": "Termination ",
+      "Template_Code": "TERMINATION",
+      "Template_Type": "TERMINATION",
+      "Description": "hvgcxfzdsxfghh",
+      "_displayId": "TMP006",
+      "created_at": "2026-05-05T04:48:42.389Z",
+      "updated_at": "2026-05-05T04:48:42.389Z"
     }
   ],
   "template_assignments": [
@@ -1874,7 +2652,27 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "TASN001"
+    },
+    {
+      "id": "8d387083-868c-4929-9ddc-7327c491008e",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_Application_ID": "9a192457-65a1-42a2-8f37-ce2ddad8a248",
+      "HRMS_Template_Master_ID": "14200a9d-3bb8-4f11-9c85-c2c60a5d3209",
+      "Assigned_Date": "2026-05-05",
+      "_displayId": "TASN002",
+      "created_at": "2026-05-05T06:26:04.900Z",
+      "updated_at": "2026-05-05T06:26:04.900Z"
     }
   ],
   "consent_letters": [
@@ -1902,7 +2700,29 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "CL001"
+    },
+    {
+      "id": "b1e79c60-3de6-4d4e-a8af-f858863d0701",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_Interview_ID": "006617cd-44a6-4eba-bb2c-d8624252a7a1",
+      "HRMS_Application_ID": "9a192457-65a1-42a2-8f37-ce2ddad8a248",
+      "HRMS_Requisition_ID": "f31d5ccc-01ed-46fc-9fda-708d7ce2ea7d",
+      "HRMS_Template_Assignment_ID": "8d387083-868c-4929-9ddc-7327c491008e",
+      "Consent_Letter_Signed": "Y",
+      "_displayId": "CL002",
+      "created_at": "2026-05-05T07:08:45.338Z",
+      "updated_at": "2026-05-05T07:08:45.338Z"
     }
   ],
   "offer_letters": [
@@ -1937,7 +2757,37 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "OL001"
+    },
+    {
+      "id": "fa1df93d-44ad-41c2-ad6d-708dafb6c8e5",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_Application_ID": "9a192457-65a1-42a2-8f37-ce2ddad8a248",
+      "HRMS_Applicant_ID": "53532899-888a-4433-9577-f05fcf826386",
+      "HRMS_Requisition_ID": "f31d5ccc-01ed-46fc-9fda-708d7ce2ea7d",
+      "HRMS_Position_ID": "0dad17f9-4242-4efd-8906-3a9447b620b2",
+      "HRMS_Consent_Letter_ID": "b1e79c60-3de6-4d4e-a8af-f858863d0701",
+      "HRMS_Template_Assignment_ID": "8d387083-868c-4929-9ddc-7327c491008e",
+      "HRMS_Grade_ID": "fa915c2c-daae-4ce0-af3c-a6d66319a048",
+      "Offered_Salary": "35000",
+      "Joining_Date": "2026-05-14",
+      "Offer_Date": "2026-05-13",
+      "Duration_Type": "PERMANENT",
+      "Offer_Letter_Signed": "Y",
+      "Offer_Expiry_Date": "2099-05-05",
+      "_displayId": "OL002",
+      "created_at": "2026-05-05T07:11:07.565Z",
+      "updated_at": "2026-05-05T07:11:07.565Z"
     }
   ],
   "hire_records": [
@@ -1967,7 +2817,34 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "HR001"
+    },
+    {
+      "id": "97fa7dc3-c2d3-4724-a48e-e0ef2a92a660",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_Application_ID": "9a192457-65a1-42a2-8f37-ce2ddad8a248",
+      "HRMS_Offer_Letter_ID": "fa1df93d-44ad-41c2-ad6d-708dafb6c8e5",
+      "HRMS_Position_ID": "0dad17f9-4242-4efd-8906-3a9447b620b2",
+      "HRMS_Grade_ID": "fa915c2c-daae-4ce0-af3c-a6d66319a048",
+      "Date_of_Joining": "2026-05-14",
+      "Offer_Period_End_Date": "2099-05-05",
+      "Employee_Type": "PERMANENT",
+      "Hired_Salary": "35000",
+      "HRMS_Department_ID": "D6",
+      "Hire_Status": "JOINED",
+      "_displayId": "HR002",
+      "created_at": "2026-05-05T07:11:39.019Z",
+      "updated_at": "2026-05-05T07:11:39.019Z"
     }
   ],
   "employees": [
@@ -2019,7 +2896,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "EMP001"
     },
     {
       "id": "E2",
@@ -2069,7 +2947,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "EMP002"
     },
     {
       "id": "E3",
@@ -2119,7 +2998,228 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "EMP003"
+    },
+    {
+      "id": "E4",
+      "HRMS_Employee_ID": "E4",
+      "Company_ID": "C2",
+      "Business_Group_ID": "BG3",
+      "Business_Type_ID": "BT1",
+      "Module_ID": "MOD1",
+      "HRMS_Department_ID": "D6",
+      "HRMS_Position_ID": "P4",
+      "Employee_Type": "PERMANENT",
+      "First_Name": "Ananya",
+      "Middle_Name": "",
+      "Last_Name": "Iyer",
+      "Date_of_Birth": "1996-04-14",
+      "Gender": "FEMALE",
+      "Marital_Status": "SINGLE",
+      "Nationality": "Indian",
+      "Email_ID": "ananya.iyer@techstar.com",
+      "Phone_Number": "9823411201",
+      "Emergency_Contact_Name": "Raghav Iyer",
+      "Emergency_Contact_Number": "9823411202",
+      "Address_Line1": "12 Baner Road",
+      "City": "Pune",
+      "State": "Maharashtra",
+      "Country": "India",
+      "Pincode": "411045",
+      "Qualification": "B.Tech",
+      "Degree_Name": "Computer Science",
+      "University_Name": "SPPU",
+      "Institute_Name": "MIT Pune",
+      "Edu_Start_Year": 2013,
+      "Edu_End_Year": 2017,
+      "Passing_Year": 2017,
+      "Percentage": 83.2,
+      "Is_Fresher": "N",
+      "Total_Experience": 6,
+      "Nominee_Name": "Raghav Iyer",
+      "Nominee_Relationship": "Father",
+      "Nominee_Date_of_Birth": "1970-01-22",
+      "Nominee_Contact_Number": "9823411202",
+      "company_id": "C2",
+      "business_group_id": "BG3",
+      "business_type_id": "BT1",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": null,
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "created_at": "2026-05-05T06:25:00.000Z",
+      "updated_at": "2026-05-05T06:25:00.000Z",
+      "_displayId": "EMP004"
+    },
+    {
+      "id": "E5",
+      "HRMS_Employee_ID": "E5",
+      "Company_ID": "C2",
+      "Business_Group_ID": "BG3",
+      "Business_Type_ID": "BT1",
+      "Module_ID": "MOD1",
+      "HRMS_Department_ID": "D7",
+      "HRMS_Position_ID": "P5",
+      "Employee_Type": "PERMANENT",
+      "First_Name": "Rohit",
+      "Middle_Name": "",
+      "Last_Name": "Deshmukh",
+      "Date_of_Birth": "1994-11-09",
+      "Gender": "MALE",
+      "Marital_Status": "MARRIED",
+      "Nationality": "Indian",
+      "Email_ID": "rohit.deshmukh@techstar.com",
+      "Phone_Number": "9811154403",
+      "Emergency_Contact_Name": "Sneha Deshmukh",
+      "Emergency_Contact_Number": "9811154404",
+      "Address_Line1": "88 Hinjewadi Phase 2",
+      "City": "Pune",
+      "State": "Maharashtra",
+      "Country": "India",
+      "Pincode": "411057",
+      "Qualification": "M.Tech",
+      "Degree_Name": "Software Engineering",
+      "University_Name": "VIT University",
+      "Institute_Name": "VIT Pune",
+      "Edu_Start_Year": 2012,
+      "Edu_End_Year": 2016,
+      "Passing_Year": 2016,
+      "Percentage": 79.5,
+      "Is_Fresher": "N",
+      "Total_Experience": 8,
+      "Nominee_Name": "Sneha Deshmukh",
+      "Nominee_Relationship": "Spouse",
+      "Nominee_Date_of_Birth": "1995-03-03",
+      "Nominee_Contact_Number": "9811154404",
+      "company_id": "C2",
+      "business_group_id": "BG3",
+      "business_type_id": "BT1",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": null,
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "created_at": "2026-05-05T06:26:00.000Z",
+      "updated_at": "2026-05-05T06:26:00.000Z",
+      "_displayId": "EMP005"
+    },
+    {
+      "id": "E6",
+      "HRMS_Employee_ID": "E6",
+      "Company_ID": "C2",
+      "Business_Group_ID": "BG3",
+      "Business_Type_ID": "BT1",
+      "Module_ID": "MOD1",
+      "HRMS_Department_ID": "D8",
+      "HRMS_Position_ID": "P6",
+      "Employee_Type": "PERMANENT",
+      "First_Name": "Meera",
+      "Middle_Name": "",
+      "Last_Name": "Nair",
+      "Date_of_Birth": "1993-06-21",
+      "Gender": "FEMALE",
+      "Marital_Status": "MARRIED",
+      "Nationality": "Indian",
+      "Email_ID": "meera.nair@techstar.com",
+      "Phone_Number": "9890017705",
+      "Emergency_Contact_Name": "Arun Nair",
+      "Emergency_Contact_Number": "9890017706",
+      "Address_Line1": "5 Wakad Main Road",
+      "City": "Pune",
+      "State": "Maharashtra",
+      "Country": "India",
+      "Pincode": "411027",
+      "Qualification": "MBA",
+      "Degree_Name": "Human Resources",
+      "University_Name": "Symbiosis International",
+      "Institute_Name": "SCMHRD",
+      "Edu_Start_Year": 2011,
+      "Edu_End_Year": 2015,
+      "Passing_Year": 2015,
+      "Percentage": 81.4,
+      "Is_Fresher": "N",
+      "Total_Experience": 9,
+      "Nominee_Name": "Arun Nair",
+      "Nominee_Relationship": "Spouse",
+      "Nominee_Date_of_Birth": "1990-09-12",
+      "Nominee_Contact_Number": "9890017706",
+      "company_id": "C2",
+      "business_group_id": "BG3",
+      "business_type_id": "BT1",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": null,
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "created_at": "2026-05-05T06:27:00.000Z",
+      "updated_at": "2026-05-05T06:27:00.000Z",
+      "_displayId": "EMP006"
+    },
+    {
+      "id": "caceb4fc-579f-43ef-bf57-c9d2529426e6",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "Hire_Record_ID": "97fa7dc3-c2d3-4724-a48e-e0ef2a92a660",
+      "Employee_Type": "PERMANENT",
+      "HRMS_Department_ID": "D6",
+      "HRMS_Position_ID": "0dad17f9-4242-4efd-8906-3a9447b620b2",
+      "HRMS_Grade_ID": "fa915c2c-daae-4ce0-af3c-a6d66319a048",
+      "Date_of_Joining": "2026-05-14",
+      "Hired_Salary": "35000",
+      "First_Name": "Kiran ",
+      "Middle_Name": "Vishwanath",
+      "Last_Name": "Patel",
+      "Date_of_Birth": "1999-07-28",
+      "Gender": "MALE",
+      "Marital_Status": "SINGLE",
+      "Nationality": "Indian",
+      "Email_ID": "kiran@gmail.com",
+      "Phone_Number": "7845868556",
+      "Alternate_Phone": "8754856748",
+      "Emergency_Contact_Name": "Jiya",
+      "Emergency_Contact_Number": "8574896574",
+      "Address_Line1": "asdhqa ashdqwbhas dqwasdbqw dqwbdqwj das, bhsabujhwbq",
+      "Address_Line2": "wqsabdhwqs",
+      "City": "Chandrapur",
+      "State": "Maharashtra",
+      "Country": "India",
+      "Pincode": "442401",
+      "Qualification": "B.Tech / B.E",
+      "Degree_Name": "Computer",
+      "Specialization": "Information Technology",
+      "University_Name": "RTMNU",
+      "Institute_Name": "iiqanjs hsabddjsabwqjsa",
+      "Edu_Start_Year": "2017",
+      "Edu_End_Year": "2021",
+      "Percentage": "87",
+      "Is_Fresher": false,
+      "Prev_Company_Name": "yqhsvqsabs",
+      "Industry_Type": "qewredtghfg",
+      "Prev_Department": "gsrdghfhgjm",
+      "Prev_Designation": "awefsdgfhg",
+      "Total_Experience": "2",
+      "Last_Drawn_Salary": "600000",
+      "Reason_For_Leaving": "lkfdfsftghuijokphjjvn h hjnbhknmn ",
+      "Nominee_Name": "kjlkhgfdxcghjk",
+      "Nominee_Relationship": "SISTER",
+      "Nominee_Date_of_Birth": "2026-05-04",
+      "Nominee_Contact_Number": "9858964186",
+      "_displayId": "EMP007",
+      "created_at": "2026-05-05T07:12:26.052Z",
+      "updated_at": "2026-05-05T07:12:26.052Z"
     }
   ],
   "bank_accounts": [
@@ -2151,7 +3251,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "BANK001"
     },
     {
       "id": "BA2",
@@ -2181,7 +3282,34 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "BANK002"
+    },
+    {
+      "id": "fba0748b-3a53-46fa-ae20-01c9d6801e07",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_Employee_ID": "caceb4fc-579f-43ef-bf57-c9d2529426e6",
+      "Bank_Name": "Bank of Baroda",
+      "Branch_Name": "Chandrapur",
+      "Account_Number": "859647867489654",
+      "IFSC_Code": "BKID0002345",
+      "Account_Type": "SALARY",
+      "Nominee_Name": "huygtrdesdghj",
+      "Nominee_Relationship": "FATHER",
+      "Nominee_Date_of_Birth": "2003-06-05",
+      "Nominee_Gender": "MALE",
+      "_displayId": "BANK003",
+      "created_at": "2026-05-05T07:13:40.052Z",
+      "updated_at": "2026-05-05T07:13:40.052Z"
     }
   ],
   "programs": [
@@ -2208,7 +3336,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "PROG001"
     },
     {
       "id": "PR2",
@@ -2233,7 +3362,30 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "PROG002"
+    },
+    {
+      "id": "3c3b0b87-1688-486d-a4aa-94c671de6cf2",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "Program_Name": "AWS Partictional",
+      "Program_Code": "AWS_PARTICTIONAL",
+      "Provider": "Thomson Javid",
+      "Duration_Hours": "2",
+      "Cost_per_Person": "1200",
+      "Delivery_Mode": "ONLINE",
+      "_displayId": "PROG003",
+      "created_at": "2026-05-05T07:15:17.019Z",
+      "updated_at": "2026-05-05T07:15:17.019Z"
     }
   ],
   "enrollments": [
@@ -2257,7 +3409,31 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "ENR001"
+    },
+    {
+      "id": "d8ad7d7c-4ee5-48a1-983c-f9afa1492bac",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_employee_id": "caceb4fc-579f-43ef-bf57-c9d2529426e6",
+      "HRMS_program_id": "3c3b0b87-1688-486d-a4aa-94c671de6cf2",
+      "enrollment_date": "2026-05-15",
+      "completion_date": "2026-06-04",
+      "completion_status": "IN_PROGRESS",
+      "score": "78",
+      "certificate_issued": "true",
+      "_displayId": "ENR002",
+      "created_at": "2026-05-05T07:16:26.694Z",
+      "updated_at": "2026-05-05T07:16:26.695Z"
     }
   ],
   "assignments": [
@@ -2282,7 +3458,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "ASN001"
     },
     {
       "id": "ASN2",
@@ -2305,7 +3482,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "ASN002"
     },
     {
       "id": "ASN3",
@@ -2328,7 +3506,32 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "ASN003"
+    },
+    {
+      "id": "ab2d1e04-1bdb-43b7-ab31-f5e38c6167e9",
+      "company_id": "C2",
+      "Business_Type_ID": "BT1",
+      "business_type_id": "BT1",
+      "business_group_id": "BG3",
+      "module_id": "MOD1",
+      "active_flag": "Y",
+      "effective_from": "2026-05-05",
+      "effective_to": "",
+      "created_by": "admin@hrms.com",
+      "updated_by": "admin@hrms.com",
+      "HRMS_employee_id": "caceb4fc-579f-43ef-bf57-c9d2529426e6",
+      "HRMS_department_id": "D6",
+      "HRMS_position_id": "0dad17f9-4242-4efd-8906-3a9447b620b2",
+      "HRMS_grade_id": "fa915c2c-daae-4ce0-af3c-a6d66319a048",
+      "HRMS_work_schedule_id": "5c7aabf2-1c87-4064-a17b-7fdbf9bc2835",
+      "HRMS_status_type_id": "d6581031-ded7-4b53-8784-bf04872b038d",
+      "assignment_type": "PERMANENT",
+      "Salary_Structure_ID": "46415631",
+      "_displayId": "ASN004",
+      "created_at": "2026-05-05T07:23:05.132Z",
+      "updated_at": "2026-05-05T07:23:05.132Z"
     }
   ],
   "supervisors": [
@@ -2349,7 +3552,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "SUP001"
     }
   ],
   "employee_histories": [
@@ -2374,7 +3578,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "EH001"
     }
   ],
   "holidays": [
@@ -2395,7 +3600,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.888Z",
-      "updated_at": "2026-05-04T10:07:38.888Z"
+      "updated_at": "2026-05-04T10:07:38.888Z",
+      "_displayId": "HOL001"
     },
     {
       "id": "H2",
@@ -2414,7 +3620,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "HOL002"
     },
     {
       "id": "H3",
@@ -2433,7 +3640,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "HOL003"
     }
   ],
   "overtimes": [
@@ -2458,7 +3666,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "OT001"
     }
   ],
   "absence_types": [
@@ -2480,7 +3689,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "ABST001"
     },
     {
       "id": "ABT2",
@@ -2500,7 +3710,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "ABST002"
     },
     {
       "id": "ABT3",
@@ -2520,7 +3731,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "ABST003"
     }
   ],
   "absences": [
@@ -2547,7 +3759,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "ABS001"
     },
     {
       "id": "ABS2",
@@ -2572,7 +3785,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "ABS002"
     }
   ],
   "leave_balances": [
@@ -2594,7 +3808,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "LB001"
     },
     {
       "id": "LB2",
@@ -2614,7 +3829,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "LB002"
     },
     {
       "id": "LB3",
@@ -2634,7 +3850,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "LB003"
     }
   ],
   "time_cards": [
@@ -2664,7 +3881,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "TC001"
     },
     {
       "id": "TC2",
@@ -2692,7 +3910,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "TC002"
     }
   ],
   "appraisal_cycles": [
@@ -2712,7 +3931,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "APC001"
     },
     {
       "id": "APC2",
@@ -2730,7 +3950,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "APC002"
     }
   ],
   "appraisals": [
@@ -2756,7 +3977,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "APR001"
     }
   ],
   "appraisal_key_areas": [
@@ -2779,7 +4001,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "AKA001"
     },
     {
       "id": "AKA2",
@@ -2800,7 +4023,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "AKA002"
     },
     {
       "id": "AKA3",
@@ -2821,7 +4045,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "AKA003"
     }
   ],
   "employee_appraisals": [
@@ -2843,7 +4068,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "EA001"
     }
   ],
   "appraisal_ratings": [
@@ -2865,7 +4091,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "AR001"
     }
   ],
   "benefit_plans": [
@@ -2887,7 +4114,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "BP001"
     },
     {
       "id": "BP2",
@@ -2907,7 +4135,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "BP002"
     }
   ],
   "benefit_enrollments": [
@@ -2933,7 +4162,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "BE001"
     }
   ],
   "competences": [
@@ -2953,7 +4183,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "COMP001"
     },
     {
       "id": "CO2",
@@ -2971,7 +4202,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "COMP002"
     },
     {
       "id": "CO3",
@@ -2989,7 +4221,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "COMP003"
     }
   ],
   "employee_competences": [
@@ -3010,7 +4243,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "EC001"
     }
   ],
   "separations": [
@@ -3036,7 +4270,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "SEP001"
     }
   ],
   "exit_checklists": [
@@ -3061,7 +4296,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "EXC001"
     }
   ],
   "final_settlements": [
@@ -3092,7 +4328,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "FS001"
     }
   ],
   "advance_payments": [
@@ -3124,7 +4361,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "ADV001"
     }
   ],
   "advance_recovery_schedules": [
@@ -3149,7 +4387,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "ARS001"
     },
     {
       "id": "ARS2",
@@ -3172,7 +4411,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "ARS002"
     }
   ],
   "user_employees": [
@@ -3205,7 +4445,8 @@
       "created_by": "system",
       "updated_by": "system",
       "created_at": "2026-05-04T10:07:38.889Z",
-      "updated_at": "2026-05-04T10:07:38.889Z"
+      "updated_at": "2026-05-04T10:07:38.889Z",
+      "_displayId": "UE001"
     }
   ]
 }

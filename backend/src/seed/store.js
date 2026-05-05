@@ -2,6 +2,8 @@ const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
+const { TABLE_PREFIXES } = require('../models');
+const { backfillDisplayIds, genId } = require('../utils/idGen');
 
 const DATA_DIR = path.join(__dirname, '..', '..', 'data');
 const DATA_FILE = path.join(DATA_DIR, 'db.json');
@@ -300,12 +302,19 @@ user_employees:[
 const db = loadDbFromDisk() || seededDb;
 // If we loaded from disk, ensure any newly added seed tables don't break runtime
 Object.keys(seededDb).forEach(k => { if (!db[k]) db[k] = seededDb[k]; });
+// Global one-time backfill for missing/invalid/duplicate display IDs in all known tables.
+const dbMutatedByBackfill = backfillDisplayIds(db);
+if (dbMutatedByBackfill) persistDbToDisk();
 
 const getAll=(t)=>(db[t]||[]).filter(r=>r.active_flag!=='N');
 const getById=(t,id)=>(db[t]||[]).find(r=>r.id===id)||null;
 const create=(t,d)=>{
   if(!db[t]) db[t]=[];
-  const r={id:uuidv4(),...d,created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
+  const body = { ...d };
+  if (TABLE_PREFIXES[t] && !body._displayId) {
+    body._displayId = genId(TABLE_PREFIXES[t], t);
+  }
+  const r={id:uuidv4(),...body,created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
   db[t].push(r);
   schedulePersist();
   return r;
@@ -320,8 +329,8 @@ const update=(t,id,d)=>{
 const softDelete=(t,id)=>{
   const i=(db[t]||[]).findIndex(r=>r.id===id);
   if(i===-1) return false;
-  db[t][i].active_flag='N';
-  db[t][i].updated_at=new Date().toISOString();
+  // Hard delete: permanently remove record from persisted store.
+  db[t].splice(i, 1);
   schedulePersist();
   return true;
 };

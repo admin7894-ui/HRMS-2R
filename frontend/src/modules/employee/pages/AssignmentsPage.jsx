@@ -17,6 +17,7 @@ export default function AssignmentsPage() {
       {key:'HRMS_position_id',label:'Position',required:true,type:'lov',lovEndpoint:'positions',labelFn:o=>o.Position_Name},
       {key:'HRMS_grade_id',label:'Grade',required:true,type:'lov',lovEndpoint:'grades',labelFn:o=>o.Grade_Name},
       {key:'HRMS_work_schedule_id',label:'Work schedule',type:'lov',lovEndpoint:'work-schedules',labelFn:o=>o.Work_Schedule_Name},
+      {key:'Salary_Structure_ID',label:'Salary structure ID',required:true,tooltip:'Manual input for now; will be replaced with Payroll LOV later.'},
       {key:'HRMS_status_type_id',label:'Status type',required:true,type:'lov',lovEndpoint:'assignment-statuses',labelFn:o=>o.Status_Name},
       {key:'assignment_type',label:'Assignment type',required:true,type:'select',options:[{v:'PERMANENT',l:'Permanent'},{v:'TEMPORARY',l:'Temporary'},{v:'TRANSFER',l:'Transfer'}]},
     ]}

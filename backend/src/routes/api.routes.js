@@ -67,6 +67,30 @@ const applyEmployeeIdFilter = (arr, employeeId) => {
   return (arr || []).filter(x => keys.some(k => String(x?.[k] ?? '').toLowerCase() === eid));
 };
 
+const buildCompanyFilterValues = (rawCompanyId) => {
+  const token = String(rawCompanyId || '').trim().toLowerCase();
+  if (!token) return [];
+  const company = (db.companies || []).find(c => {
+    const candidates = [c.id, c.Company_ID, c._displayId, c.Company_Name]
+      .filter(Boolean)
+      .map(v => String(v).trim().toLowerCase());
+    return candidates.includes(token);
+  });
+  if (!company) return [token];
+  return [company.id, company.Company_ID, company._displayId, company.Company_Name]
+    .filter(Boolean)
+    .map(v => String(v).trim().toLowerCase());
+};
+
+const filterApplicationsByCompany = (rows, rawCompanyId) => {
+  const accepted = new Set(buildCompanyFilterValues(rawCompanyId));
+  if (accepted.size === 0) return rows;
+  const companyKeys = ['company_id', 'Company_ID'];
+  return (rows || []).filter(x =>
+    companyKeys.some(key => accepted.has(String(x?.[key] || '').trim().toLowerCase()))
+  );
+};
+
 const listWith = (table, searchFields, enrich) => (req, res) => {
   try {
     let all = db[table] || [];
@@ -122,7 +146,22 @@ r.post('/grade-steps', gsCtrl.create);
 r.put('/grade-steps/:id', gsCtrl.update);
 r.delete('/grade-steps/:id', gsCtrl.remove);
 r.patch('/grade-steps/:id/toggle-status', gsCtrl.toggleStatus);
-wire('grade-ladders',        'grade_ladders',        ['Ladder_Name']);
+// Grade ladders — enrich with from/to grade names
+const glCtrl = makeController('grade_ladders', ['Ladder_Name']);
+r.get('/grade-ladders', listWith('grade_ladders', ['Ladder_Name'], x => {
+  const fromGrade = (db.grades || []).find(g => g.id === x.HRMS_From_Grade_ID);
+  const toGrade = (db.grades || []).find(g => g.id === x.HRMS_To_Grade_ID);
+  return {
+    ...x,
+    _fromGradeName: fromGrade?.Grade_Name || x.HRMS_From_Grade_ID || null,
+    _toGradeName: toGrade?.Grade_Name || x.HRMS_To_Grade_ID || null,
+  };
+}));
+r.get('/grade-ladders/:id', glCtrl.get);
+r.post('/grade-ladders', glCtrl.create);
+r.put('/grade-ladders/:id', glCtrl.update);
+r.delete('/grade-ladders/:id', glCtrl.remove);
+r.patch('/grade-ladders/:id/toggle-status', glCtrl.toggleStatus);
 wire('jobs',                 'jobs',                 ['Job_Name', 'Job_Code'], 'Job_Code', 'Job_Name');
 // Positions — enrich list with _jobName and _gradeName
 const posCtrl = makeController('positions', ['Position_Name']);
@@ -198,9 +237,28 @@ const appCtrl = makeController('applications', ['Application_Status', 'Email_ID'
 r.get('/applications', (req, res) => {
   try {
     let all = db.applications || [];
+    if (req.query.company_id) {
+      all = filterApplicationsByCompany(all, req.query.company_id);
+    }
     if (req.query.q) { const lq=req.query.q.toLowerCase(); all=all.filter(x=>['Application_Status','Email_ID','First_Name','Last_Name'].some(f=>String(x[f]??'').toLowerCase().includes(lq))); }
     all = applyEmployeeIdFilter(all, req.query.employee_id);
-    const skip = new Set(['q','page','limit','sortBy','sortOrder','employee_id']);
+    const skip = new Set([
+      'q',
+      'page',
+      'limit',
+      'sortBy',
+      'sortOrder',
+      'employee_id',
+      'company_id',
+      // Applications may be submitted from public flow with incomplete org keys.
+      // Do not hard-filter them out in Applicant LOV when company is valid.
+      'business_type_id',
+      'business_group_id',
+      'module_id',
+      'Business_Type_ID',
+      'Business_Group_ID',
+      'Module_ID',
+    ]);
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k)&&v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
     // Backfill _displayId for records that don't have one yet
