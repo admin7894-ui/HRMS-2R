@@ -135,7 +135,7 @@ const listWith = (table, searchFields, enrich) => (req, res) => {
     }
     // Common filter alias: employee_id -> various employee columns
     if (req.query.employee_id) {
-      all = applyEmployeeIdFilter(all, req.query.employee_id, 'requisitions');
+      all = applyEmployeeIdFilter(all, req.query.employee_id, table);
     }
     const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder', 'employee_id']);
     Object.entries(req.query).forEach(([k, v]) => {
@@ -638,16 +638,96 @@ r.delete('/employee-histories/:id', ehCtrl.remove);
 r.patch('/employee-histories/:id/toggle-status', ehCtrl.toggleStatus);
 wire('holidays',             'holidays',             ['holiday_name', 'holiday_type']);
 wire('absence-types',        'absence_types',        ['absence_name', 'absence_code'], 'absence_code', 'absence_name');
+const syncLeaveBalance = (employeeId, absenceTypeId) => {
+  const approved = (db.absences || []).filter(a =>
+    String(a.HRMS_employee_id) === String(employeeId) &&
+    String(a.HRMS_absence_type_id) === String(absenceTypeId) &&
+    a.status === 'APPROVED' &&
+    a.active_flag !== 'N'
+  );
+  const used = approved.reduce((s, a) => s + (parseFloat(a.days) || 0), 0);
+  const lastLeave = approved.length > 0
+    ? [...approved].map(a => a.start_date).sort().reverse()[0]
+    : null;
+
+  const at = (db.absence_types || []).find(t => t.id === absenceTypeId);
+  const entitlement = at ? parseFloat(at.entitlement_per_year) || 0 : 0;
+
+  let lb = (db.leave_balances || []).find(l =>
+    String(l.HRMS_employee_id) === String(employeeId) &&
+    String(l.HRMS_absence_type_id) === String(absenceTypeId)
+  );
+
+  if (lb) {
+    update('leave_balances', lb.id, {
+      used,
+      entitlement,
+      balance: entitlement - used,
+      last_leave_date: lastLeave,
+      updated_at: new Date().toISOString()
+    });
+  } else if (approved.length > 0) {
+    const emp = (db.employees || []).find(e => e.id === employeeId);
+    create('leave_balances', {
+      HRMS_employee_id: employeeId,
+      HRMS_absence_type_id: absenceTypeId,
+      entitlement,
+      used,
+      balance: entitlement - used,
+      last_leave_date: lastLeave,
+      company_id: emp?.company_id || emp?.Company_ID || 'C1',
+      business_group_id: emp?.business_group_id || emp?.Business_Group_ID || 'BG1',
+      business_type_id: emp?.business_type_id || emp?.Business_Type_ID || 'BT1',
+      module_id: 'MOD1',
+      active_flag: 'Y',
+      effective_from: new Date().toISOString().split('T')[0],
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      _displayId: genId('LB', 'leave_balances')
+    });
+  }
+};
+
 const absCtrl = makeController('absences', ['status']);
 r.get('/absences', listWith('absences', ['status'], x => {
   const Employee_Name = employeeName(x.HRMS_employee_id);
   return { ...x, Employee_Name, _empName: Employee_Name };
 }));
 r.get('/absences/:id', absCtrl.get);
-r.post('/absences', absCtrl.create);
-r.put('/absences/:id', absCtrl.update);
-r.delete('/absences/:id', absCtrl.remove);
-r.patch('/absences/:id/toggle-status', absCtrl.toggleStatus);
+r.post('/absences', (req, res) => {
+  try {
+    const body = { ...req.body, _displayId: genId('ABS', 'absences'), active_flag: 'Y', created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    const rec = create('absences', body);
+    if (rec.status === 'APPROVED') syncLeaveBalance(rec.HRMS_employee_id, rec.HRMS_absence_type_id);
+    ok(res, rec, 'Created', 201);
+  } catch (e) { err(res, e.message); }
+});
+r.put('/absences/:id', (req, res) => {
+  try {
+    const existing = (db.absences || []).find(r => r.id === req.params.id);
+    if (!existing) return err(res, 'Not found', 404);
+    const rec = update('absences', req.params.id, { ...req.body, updated_at: new Date().toISOString() });
+    syncLeaveBalance(rec.HRMS_employee_id, rec.HRMS_absence_type_id);
+    ok(res, rec, 'Updated');
+  } catch (e) { err(res, e.message); }
+});
+r.delete('/absences/:id', (req, res) => {
+  const existing = (db.absences || []).find(r => r.id === req.params.id);
+  if (!existing) return err(res, 'Not found', 404);
+  const { softDelete } = require('../seed/store');
+  softDelete('absences', req.params.id);
+  syncLeaveBalance(existing.HRMS_employee_id, existing.HRMS_absence_type_id);
+  ok(res, null, 'Deleted');
+});
+r.patch('/absences/:id/toggle-status', (req, res) => {
+  const existing = (db.absences || []).find(r => r.id === req.params.id);
+  if (!existing) return err(res, 'Not found', 404);
+  const newFlag = existing.active_flag === 'Y' ? 'N' : 'Y';
+  const rec = update('absences', req.params.id, { active_flag: newFlag });
+  syncLeaveBalance(rec.HRMS_employee_id, rec.HRMS_absence_type_id);
+  ok(res, rec, 'Status toggled');
+});
+
 const lbCtrl = makeController('leave_balances', ['HRMS_employee_id']);
 r.get('/leave-balances', listWith('leave_balances', ['HRMS_employee_id'], x => {
   const Employee_Name = employeeName(x.HRMS_employee_id);
@@ -655,8 +735,26 @@ r.get('/leave-balances', listWith('leave_balances', ['HRMS_employee_id'], x => {
   return { ...x, Employee_Name, Absence_Type_Name, _empName: Employee_Name, _absenceTypeName: Absence_Type_Name };
 }));
 r.get('/leave-balances/:id', lbCtrl.get);
-r.post('/leave-balances', lbCtrl.create);
-r.put('/leave-balances/:id', lbCtrl.update);
+r.post('/leave-balances', (req, res) => {
+  try {
+    const { HRMS_employee_id, HRMS_absence_type_id } = req.body;
+    const existing = (db.leave_balances || []).find(l => String(l.HRMS_employee_id) === String(HRMS_employee_id) && String(l.HRMS_absence_type_id) === String(HRMS_absence_type_id));
+    if (existing) return err(res, 'A leave balance record already exists for this employee and absence type', 400);
+    const body = { ...req.body, _displayId: genId('LB', 'leave_balances'), active_flag: 'Y', created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    const rec = create('leave_balances', body);
+    syncLeaveBalance(rec.HRMS_employee_id, rec.HRMS_absence_type_id);
+    ok(res, rec, 'Created', 201);
+  } catch (e) { err(res, e.message); }
+});
+r.put('/leave-balances/:id', (req, res) => {
+  try {
+    const existing = (db.leave_balances || []).find(r => r.id === req.params.id);
+    if (!existing) return err(res, 'Not found', 404);
+    const rec = update('leave_balances', req.params.id, { ...req.body, updated_at: new Date().toISOString() });
+    syncLeaveBalance(rec.HRMS_employee_id, rec.HRMS_absence_type_id);
+    ok(res, rec, 'Updated');
+  } catch (e) { err(res, e.message); }
+});
 r.delete('/leave-balances/:id', lbCtrl.remove);
 r.patch('/leave-balances/:id/toggle-status', lbCtrl.toggleStatus);
 wire('appraisal-cycles',     'appraisal_cycles',     ['cycle_name']);
