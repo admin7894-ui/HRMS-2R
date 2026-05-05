@@ -60,12 +60,12 @@ export default function UserEmployeesPage() {
         }));
 
         const endpoints = [
-          { ep: 'applications', key: 'Application_ID', viaMapping: true },
-          { ep: 'applicants', key: 'Applicant_ID', viaMapping: true },
-          { ep: 'template-assignments', key: 'Template_Assignment_ID', viaMapping: true },
+          { ep: 'applicants', key: 'Applicant_ID' },
+          { ep: 'applications', key: 'Application_ID' },
+          { ep: 'template-assignments', key: 'Template_Assignment_ID' },
           { ep: 'bank-accounts', key: 'Person_Bank_Account_ID' },
-          { ep: 'consent-letters', key: 'Consent_Letter_ID', viaMapping: true },
-          { ep: 'offer-letters', key: 'Offer_Letter_ID', viaMapping: true },
+          { ep: 'consent-letters', key: 'Consent_Letter_ID' },
+          { ep: 'offer-letters', key: 'Offer_Letter_ID' },
           { ep: 'assignments', key: 'Assignment_ID' },
           { ep: 'supervisors', key: 'Supervisor_ID', valueKey: 'supervisor_employee_id' },
           { ep: 'leave-balances', key: 'Leave_Balance_ID' },
@@ -79,22 +79,18 @@ export default function UserEmployeesPage() {
         ];
 
         const fetches = [
-          ...endpoints.map(({ ep, viaMapping }) =>
-            viaMapping
-              ? Promise.resolve({ ep, data: [] })
-              : api.get('/' + ep, { params: { employee_id: employeeId, limit: 500 } })
-                  .then(r => ({ ep, data: r.data || [] }))
-                  .catch(() => ({ ep, data: [] }))
+          ...endpoints.map(({ ep }) =>
+            api.get('/' + ep, { params: { employee_id: employeeId, limit: 500 } })
+              .then(r => ({ ep, data: r.data || [] }))
+              .catch(() => ({ ep, data: [] }))
           ),
           api.get('/user-employees', { params: { Employee_ID: employeeId, limit: 1 } })
             .then(r => ({ ep: '__mapping__', data: r.data || [] }))
             .catch(() => ({ ep: '__mapping__', data: [] })),
         ];
 
-        Promise.all(
-          fetches
-        ).then(results => {
-          if (reqId !== reqIdRef.current) return; // ignore stale response
+        Promise.all(fetches).then(results => {
+          if (reqId !== reqIdRef.current) return;
 
           const mapping = results.find(x => x.ep === '__mapping__')?.data?.[0] || null;
           const nextLov = { ...lovData };
@@ -105,13 +101,8 @@ export default function UserEmployeesPage() {
             const data = results.find(x => x.ep === ep)?.data || [];
             nextLov[ep] = data;
 
-            if (spec.viaMapping) {
-              nextForm[key] = mapping?.[key] || '';
-              return;
-            }
-
             if (!data || data.length === 0) {
-              nextForm[key] = '';
+              nextForm[key] = mapping?.[key] || '';
               return;
             }
 

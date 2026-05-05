@@ -60,11 +60,46 @@ const formatChecklistItems = value => String(value || '')
   .filter(Boolean)
   .join(', ');
 
-const applyEmployeeIdFilter = (arr, employeeId) => {
+const applyEmployeeIdFilter = (arr, employeeId, tableName) => {
   if (!employeeId) return arr;
   const eid = String(employeeId).toLowerCase();
   const keys = ['HRMS_employee_id', 'HRMS_Employee_ID', 'Employee_ID', 'employee_id'];
-  return (arr || []).filter(x => keys.some(k => String(x?.[k] ?? '').toLowerCase() === eid));
+  let filtered = (arr || []).filter(x => keys.some(k => String(x?.[k] ?? '').toLowerCase() === eid));
+
+  // Trace recruitment links if direct link is missing
+  const recruitmentTables = ['applicants', 'applications', 'offer_letters', 'consent_letters', 'template_assignments', 'interviews'];
+  if (filtered.length === 0 && tableName && recruitmentTables.includes(tableName)) {
+    const emp = (db.employees || []).find(e => String(e.id || '').toLowerCase() === eid || String(e.HRMS_Employee_ID || '').toLowerCase() === eid);
+    const hrid = emp?.Hire_Record_ID;
+    if (hrid) {
+      const hr = (db.hire_records || []).find(r => String(r.id || '').toLowerCase() === String(hrid).toLowerCase() || String(r.HRMS_Hire_Record_ID || '').toLowerCase() === String(hrid).toLowerCase());
+      if (hr) {
+        const appId = hr.HRMS_Application_ID;
+        const offId = hr.HRMS_Offer_Letter_ID;
+
+        if (tableName === 'applications' || tableName === 'interviews') {
+          filtered = (arr || []).filter(x => String(x.id || '').toLowerCase() === String(appId).toLowerCase() || String(x.HRMS_Application_ID || '').toLowerCase() === String(appId).toLowerCase());
+        } else if (tableName === 'offer_letters') {
+          filtered = (arr || []).filter(x => String(x.id || '').toLowerCase() === String(offId).toLowerCase() || String(x.HRMS_Offer_Letter_ID || '').toLowerCase() === String(offId).toLowerCase());
+        } else {
+          const app = (db.applications || []).find(a => String(a.id || '').toLowerCase() === String(appId).toLowerCase() || String(a.HRMS_Application_ID || '').toLowerCase() === String(appId).toLowerCase());
+          const off = (db.offer_letters || []).find(o => String(o.id || '').toLowerCase() === String(offId).toLowerCase() || String(o.HRMS_Offer_Letter_ID || '').toLowerCase() === String(offId).toLowerCase());
+
+          if (tableName === 'applicants') {
+            const applicantId = app?.HRMS_Applicant_ID || off?.HRMS_Applicant_ID || hr?.HRMS_Applicant_ID;
+            if (applicantId) filtered = (arr || []).filter(x => String(x.id || '').toLowerCase() === String(applicantId).toLowerCase() || String(x.HRMS_Applicant_ID || '').toLowerCase() === String(applicantId).toLowerCase());
+          } else if (tableName === 'consent_letters') {
+            const consentId = off?.HRMS_Consent_Letter_ID;
+            if (consentId) filtered = (arr || []).filter(x => String(x.id || '').toLowerCase() === String(consentId).toLowerCase() || String(x.HRMS_Consent_Letter_ID || '').toLowerCase() === String(consentId).toLowerCase());
+          } else if (tableName === 'template_assignments') {
+            const templateId = off?.HRMS_Template_Assignment_ID || app?.HRMS_Template_Assignment_ID;
+            if (templateId) filtered = (arr || []).filter(x => String(x.id || '').toLowerCase() === String(templateId).toLowerCase() || String(x.HRMS_Template_Assignment_ID || '').toLowerCase() === String(templateId).toLowerCase());
+          }
+        }
+      }
+    }
+  }
+  return filtered;
 };
 
 const buildCompanyFilterValues = (rawCompanyId) => {
@@ -100,7 +135,7 @@ const listWith = (table, searchFields, enrich) => (req, res) => {
     }
     // Common filter alias: employee_id -> various employee columns
     if (req.query.employee_id) {
-      all = applyEmployeeIdFilter(all, req.query.employee_id);
+      all = applyEmployeeIdFilter(all, req.query.employee_id, 'requisitions');
     }
     const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder', 'employee_id']);
     Object.entries(req.query).forEach(([k, v]) => {
@@ -231,7 +266,57 @@ r.delete('/requisitions/:id',           reqCtrl.remove);
 r.patch('/requisitions/:id/toggle-status', reqCtrl.toggleStatus);
 
 wire('job-postings',         'job_postings',         ['Posting_Title', 'Posting_Status']);
-wire('applicants',           'applicants',           ['First_Name', 'Last_Name', 'Email']);
+r.get('/applicants', (req, res) => {
+  try {
+    let all = db.applicants || [];
+    if (req.query.q) {
+      const lq = req.query.q.toLowerCase();
+      all = all.filter(x => ['First_Name', 'Last_Name', 'Email'].some(f => String(x[f] ?? '').toLowerCase().includes(lq)));
+    }
+    all = applyEmployeeIdFilter(all, req.query.employee_id, 'applicants');
+    const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder', 'employee_id']);
+    Object.entries(req.query).forEach(([k, v]) => {
+      if (!skip.has(k) && v) {
+        const vals = Array.isArray(v) ? v : [v];
+        all = all.filter(x => vals.some(vv => String(x[k] ?? '').toLowerCase() === vv.toLowerCase()));
+      }
+    });
+    if (req.query.sortBy) {
+      const dir = req.query.sortOrder === 'desc' ? -1 : 1;
+      all = [...all].sort((a, b) => String(a[req.query.sortBy] ?? '').localeCompare(String(b[req.query.sortBy] ?? ''), undefined, { numeric: true }) * dir);
+    }
+    const pg = Math.max(1, +req.query.page || 1), lim = Math.min(200, +req.query.limit || 10);
+    res.json({ success: true, data: all.slice((pg-1)*lim, pg*lim), total: all.length, page: pg, limit: lim, pages: Math.ceil(all.length / lim) });
+  } catch (e) { err(res, e.message, 500); }
+});
+r.get('/applicants/:id', (req, res) => {
+  const x = (db.applicants || []).find(r => r.id === req.params.id);
+  if (!x) return err(res, 'Not found', 404);
+  ok(res, x);
+});
+r.post('/applicants', (req, res) => {
+  try {
+    const body = { ...req.body, _displayId: genId('APL', 'applicants'), active_flag: 'Y', created_by: req.user?.username || 'system', updated_by: req.user?.username || 'system', created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    ok(res, create('applicants', body), 'Created', 201);
+  } catch (e) { err(res, e.message); }
+});
+r.put('/applicants/:id', (req, res) => {
+  const existing = (db.applicants || []).find(r => r.id === req.params.id);
+  if (!existing) return err(res, 'Not found', 404);
+  ok(res, update('applicants', req.params.id, { ...req.body, updated_by: req.user?.username || 'system', updated_at: new Date().toISOString() }));
+});
+r.delete('/applicants/:id', (req, res) => {
+  if (! (db.applicants || []).find(r => r.id === req.params.id)) return err(res, 'Not found', 404);
+  const { softDelete } = require('../seed/store');
+  softDelete('applicants', req.params.id);
+  ok(res, null, 'Deleted');
+});
+r.patch('/applicants/:id/toggle-status', (req, res) => {
+  const x = (db.applicants || []).find(r => r.id === req.params.id);
+  if (!x) return err(res, 'Not found', 404);
+  const newFlag = x.active_flag === 'Y' ? 'N' : 'Y';
+  ok(res, update('applicants', req.params.id, { active_flag: newFlag, updated_by: req.user?.username }), 'Status toggled');
+});
 // Applications — custom list: backfill _displayId for records created before ID gen was in place
 const appCtrl = makeController('applications', ['Application_Status', 'Email_ID', 'First_Name', 'Last_Name']);
 r.get('/applications', (req, res) => {
@@ -241,7 +326,7 @@ r.get('/applications', (req, res) => {
       all = filterApplicationsByCompany(all, req.query.company_id);
     }
     if (req.query.q) { const lq=req.query.q.toLowerCase(); all=all.filter(x=>['Application_Status','Email_ID','First_Name','Last_Name'].some(f=>String(x[f]??'').toLowerCase().includes(lq))); }
-    all = applyEmployeeIdFilter(all, req.query.employee_id);
+    all = applyEmployeeIdFilter(all, req.query.employee_id, 'applications');
     const skip = new Set([
       'q',
       'page',
@@ -284,7 +369,7 @@ r.get('/interviews', (req, res) => {
   try {
     let all = db.interviews || [];
     if (req.query.q) { const lq = req.query.q.toLowerCase(); all = all.filter(x => String(x.Interview_Status??'').toLowerCase().includes(lq)); }
-    const skip = new Set(['q','page','limit','sortBy','sortOrder']);
+    all = applyEmployeeIdFilter(all, req.query.employee_id, 'interviews');
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k) && v) { const vals = Array.isArray(v)?v:[v]; all = all.filter(x => vals.some(vv => String(x[k]??'').toLowerCase() === vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir = req.query.sortOrder==='desc'?-1:1; all = [...all].sort((a,b) => String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
     all = all.map(x => {
@@ -328,7 +413,7 @@ r.get('/template-assignments', (req, res) => {
   try {
     let all = db.template_assignments || [];
     if (req.query.q) { const lq = req.query.q.toLowerCase(); all = all.filter(x => String(x.Assigned_Date??'').toLowerCase().includes(lq)); }
-    all = applyEmployeeIdFilter(all, req.query.employee_id);
+    all = applyEmployeeIdFilter(all, req.query.employee_id, 'template_assignments');
     const skip = new Set(['q','page','limit','sortBy','sortOrder','employee_id']);
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k) && v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
@@ -353,7 +438,7 @@ r.get('/consent-letters', (req, res) => {
   try {
     let all = db.consent_letters || [];
     if (req.query.q) { const lq=req.query.q.toLowerCase(); all=all.filter(x=>String(x.Consent_Letter_Signed??'').toLowerCase().includes(lq)); }
-    all = applyEmployeeIdFilter(all, req.query.employee_id);
+    all = applyEmployeeIdFilter(all, req.query.employee_id, 'consent_letters');
     const skip = new Set(['q','page','limit','sortBy','sortOrder','employee_id']);
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k) && v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
@@ -377,7 +462,7 @@ r.get('/offer-letters', (req, res) => {
   try {
     let all = db.offer_letters || [];
     if (req.query.q) { const lq=req.query.q.toLowerCase(); all=all.filter(x=>String(x.Duration_Type??'').toLowerCase().includes(lq)); }
-    all = applyEmployeeIdFilter(all, req.query.employee_id);
+    all = applyEmployeeIdFilter(all, req.query.employee_id, 'offer_letters');
     const skip = new Set(['q','page','limit','sortBy','sortOrder','employee_id']);
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k)&&v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
@@ -486,8 +571,8 @@ r.get('/assignments', (req, res) => {
     let all = db.assignments || [];
     const employeeFilter = req.query.employee_id || req.query.HRMS_employee_id;
     if (req.query.q) { const lq=req.query.q.toLowerCase(); all=all.filter(x=>String(x.assignment_type??'').toLowerCase().includes(lq)); }
-    if (employeeFilter) all = all.filter(x => String(x.HRMS_employee_id) === String(employeeFilter));
-    const skip = new Set(['q','page','limit','sortBy','sortOrder']);
+    if (employeeFilter) all = applyEmployeeIdFilter(all, employeeFilter, 'assignments');
+    const skip = new Set(['q','page','limit','sortBy','sortOrder','employee_id','HRMS_employee_id']);
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k)&&v) { const vals=Array.isArray(v)?v:[v]; all=all.filter(x=>vals.some(vv=>String(x[k]??'').toLowerCase()===vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir=req.query.sortOrder==='desc'?-1:1; all=[...all].sort((a,b)=>String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
     all = all.map(x => {
