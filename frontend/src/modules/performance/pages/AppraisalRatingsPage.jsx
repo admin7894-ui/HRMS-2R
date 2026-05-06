@@ -157,7 +157,38 @@ export default function AppraisalRatingsPage() {
           onToggleStatus={async (id, isActive) => { if (isActive && !window.confirm('Deactivate?')) return; await crud.toggle(id); load(); }} />
         <Pagination page={page} pages={pages} total={total} perPage={perPage} setPage={setPage} setPerPage={setPerPage} />
       </div>
-      <ViewModal open={!!viewing} onClose={() => setViewing(null)} title="Appraisal rating" record={viewing} cols={cols} />
+      <ViewModal open={!!viewing} onClose={() => setViewing(null)} title="Appraisal rating" record={viewing} cols={cols}>
+        {viewing?.hr_ratings && (
+          <div className="mt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-primary-700">Key Area Ratings Detail</h4>
+              <div className="flex-1 h-px bg-primary-100"/>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="tbl text-xs">
+                <thead className="thead">
+                  <tr>
+                    <th className="th">Key Area</th>
+                    <th className="th text-center">Self Rating</th>
+                    <th className="th text-center">HR Rating</th>
+                    <th className="th">HR Comments</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(viewing.hr_ratings).map(([kid, r]) => (
+                    <tr key={kid} className="tr">
+                      <td className="td font-medium">{r.key_area_name}</td>
+                      <td className="td text-center">{r.self_rating}</td>
+                      <td className="td text-center font-bold text-primary-600">{r.hr_rating}</td>
+                      <td className="td text-sm text-gray-600 italic">{r.hr_comments}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </ViewModal>
       <Modal open={modal} onClose={() => { setModal(false); setEditing(null); }} title={`${editing ? 'Edit' : 'Add'} appraisal rating`} size="2xl"
         footer={<>
           <button onClick={() => { setModal(false); setEditing(null); }} className="btn-outline btn">Cancel</button>

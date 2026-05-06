@@ -966,6 +966,17 @@ r.get('/employee-appraisals', listWith('employee_appraisals', ['appraisal_status
   const appraisal = (db.appraisals || []).find(a => a.id === x.HRMS_appraisal_id);
   const cycleName = cycle?.cycle_name || null;
   const appraisalRef = appraisal?.review_period || appraisal?._displayId || x.HRMS_appraisal_id || null;
+
+  // Enrich with HR ratings if available
+  const ar = (db.appraisal_ratings || []).find(r => r.HRMS_employee_appraisal_id === x.id);
+  const enrichedRatings = {};
+  if (x.key_area_ratings) {
+    Object.entries(x.key_area_ratings).forEach(([kid, ka]) => {
+      const hr = ar?.hr_ratings?.[kid] || {};
+      enrichedRatings[kid] = { ...ka, hr_rating: hr.hr_rating || '-', hr_comments: hr.hr_comments || '-' };
+    });
+  }
+
   return {
     ...x,
     Employee_Name,
@@ -974,6 +985,7 @@ r.get('/employee-appraisals', listWith('employee_appraisals', ['appraisal_status
     _empName: Employee_Name,
     _cycleName: cycleName,
     _appraisalRef: cycleName || appraisalRef,
+    key_area_ratings: enrichedRatings
   };
 }));
 r.get('/employee-appraisals/:id', eaCtrl.get);
@@ -1002,6 +1014,20 @@ r.get('/appraisal-ratings', (req, res) => {
       const ea = (db.employee_appraisals || []).find(e => e.id === x.HRMS_employee_appraisal_id);
       const Employee_Name = employeeName(ea?.HRMS_employee_id);
       const cycle = (db.appraisal_cycles || []).find(c => c.id === ea?.HRMS_appraisal_cycle_id);
+
+      // Enrich hr_ratings with names and self ratings
+      const enrichedHrRatings = {};
+      if (x.hr_ratings) {
+        Object.entries(x.hr_ratings).forEach(([kid, r]) => {
+          const eaRating = (ea?.key_area_ratings || {})[kid] || {};
+          enrichedHrRatings[kid] = {
+            ...r,
+            key_area_name: eaRating.key_area_name || kid,
+            self_rating: eaRating.self_rating || '-'
+          };
+        });
+      }
+
       return {
         ...x,
         employee_id: ea?.HRMS_employee_id || null,
@@ -1011,6 +1037,7 @@ r.get('/appraisal-ratings', (req, res) => {
         _eaRef: Employee_Name && (cycle?.cycle_name || ea?.review_period)
           ? `${Employee_Name} - ${cycle?.cycle_name || ea?.review_period}`
           : x.HRMS_employee_appraisal_id,
+        hr_ratings: enrichedHrRatings
       };
     });
     if (employeeFilter) all = all.filter(x => String(x.employee_id) === String(employeeFilter));

@@ -204,7 +204,7 @@ export const Modal = ({ open, onClose, title, children, footer, size = 'xl' }) =
 };
 
 // ── View Modal — all fields, LOV values resolved ─────────────────────────────
-export const ViewModal = ({ open, onClose, title, record, cols, sections, fields, lovData }) => {
+export const ViewModal = ({ open, onClose, title, record, cols, sections, fields, lovData, children }) => {
   if (!open || !record) return null;
 
   // Resolve a LOV field value (UUID) to its display name
@@ -351,6 +351,7 @@ export const ViewModal = ({ open, onClose, title, record, cols, sections, fields
         { key: 'updated_by', label: 'Updated by' },
         { key: 'active_flag', label: 'Status', type: 'badge' },
       ])}
+      {children}
     </Modal>
   );
 };

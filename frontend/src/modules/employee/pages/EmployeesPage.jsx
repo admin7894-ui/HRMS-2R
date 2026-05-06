@@ -99,8 +99,8 @@ export default function EmployeesPage() {
       {key:'Specialization', label:'Specialization',required:true, section:'Education'},
       {key:'University_Name',label:'University',    required:true, section:'Education'},
       {key:'Institute_Name', label:'Institute name',required:true, section:'Education'},
-      {key:'Edu_Start_Year', label:'Start year',    required:true, type:'date', section:'Education', tooltip:'DD-MM-YYYY format'},
-      {key:'Edu_End_Year',   label:'End year',      required:true, type:'date', section:'Education'},
+      {key:'Edu_Start_Year', label:'Start year',    required:true, type:'number', min:1950, max:new Date().getFullYear(), section:'Education', tooltip:'YYYY format'},
+      {key:'Edu_End_Year',   label:'End year',      required:true, type:'number', min:1950, max:new Date().getFullYear(), section:'Education', tooltip:'YYYY format'},
       {key:'Percentage',     label:'Percentage',    required:true, numeric:true, min:0, max:100, section:'Education'},
       // ── Experience ─────────────────────────────────────────────────────────
       {key:'Is_Fresher',        label:'Is fresher',            type:'select', options:[{v:'Y',l:'Yes'},{v:'N',l:'No'}], section:'Experience'},

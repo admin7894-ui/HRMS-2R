@@ -265,7 +265,38 @@ export default function EmployeeAppraisalsPage() {
         <Pagination page={page} pages={pages} total={total} perPage={perPage} setPage={setPage} setPerPage={setPerPage} />
       </div>
 
-      <ViewModal open={!!viewing} onClose={() => setViewing(null)} title="Employee appraisal" record={viewing} cols={cols} />
+      <ViewModal open={!!viewing} onClose={() => setViewing(null)} title="Employee appraisal" record={viewing} cols={cols}>
+        {viewing?.key_area_ratings && (
+          <div className="mt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-primary-700">Key Areas & Ratings</h4>
+              <div className="flex-1 h-px bg-primary-100"/>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="tbl text-xs">
+                <thead className="thead">
+                  <tr>
+                    <th className="th">Key Area</th>
+                    <th className="th text-center">Weightage %</th>
+                    <th className="th text-center">Self Rating</th>
+                    <th className="th text-center">HR Rating</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(viewing.key_area_ratings).map(([kid, ka]) => (
+                    <tr key={kid} className="tr">
+                      <td className="td font-medium">{ka.key_area_name}</td>
+                      <td className="td text-center">{ka.key_area_weightage}%</td>
+                      <td className="td text-center">{ka.self_rating}</td>
+                      <td className="td text-center font-bold text-primary-600">{ka.hr_rating}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </ViewModal>
 
       <Modal
         open={modal}
