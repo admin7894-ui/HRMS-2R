@@ -389,9 +389,9 @@ export const DataTable = ({ cols, data, loading, onEdit, onDelete, onView, onTog
             : data.length === 0
             ? <tr><td colSpan={cols.length + 4} className="td text-center py-14 text-gray-400"><div className="text-4xl mb-2">📭</div>No records found</td></tr>
             : data.map((row, i) => (
-              <tr key={row.id || i} className={`tr ${row.active_flag === 'N' ? 'opacity-60 bg-gray-50/50' : ''}`}>
-                <td className="td text-gray-400 text-xs font-mono">{i + 1}</td>
-                <td className="td font-mono text-xs text-primary-700 font-bold whitespace-nowrap">{row._displayId || '—'}</td>
+              <tr key={row.id || i} className={`tr ${row.isSummary ? 'bg-gray-100 font-bold' : (row.active_flag === 'N' ? 'opacity-60 bg-gray-50/50' : '')}`}>
+                <td className="td text-gray-400 text-xs font-mono">{row.isSummary ? '' : i + 1}</td>
+                <td className="td font-mono text-xs text-primary-700 font-bold whitespace-nowrap">{row.isSummary ? '' : (row._displayId || '—')}</td>
                 {cols.map(c => (
                   <td key={c.key + i} className="td">
                     {c.render ? c.render(row[c.key], row)
@@ -403,14 +403,16 @@ export const DataTable = ({ cols, data, loading, onEdit, onDelete, onView, onTog
                   </td>
                 ))}
                 <td className="td">
-                  <StatusToggle active={row.active_flag !== 'N'} onToggle={() => onToggleStatus?.(row.id, row.active_flag !== 'N')}/>
+                  {!row.isSummary && <StatusToggle active={row.active_flag !== 'N'} onToggle={() => onToggleStatus?.(row.id, row.active_flag !== 'N')}/>}
                 </td>
                 <td className="td">
-                  <div className="flex gap-1 justify-center">
-                    {onView && <button className="btn btn-ghost btn-xs text-blue-500 hover:bg-blue-50 px-1.5" onClick={() => onView(row)} title="View">👁</button>}
-                    {onEdit && <button className="btn btn-ghost btn-xs text-amber-500 hover:bg-amber-50 px-1.5" onClick={() => onEdit(row)} title="Edit">✏️</button>}
-                    {onDelete && <button className="btn btn-ghost btn-xs text-red-500 hover:bg-red-50 px-1.5" onClick={() => onDelete(row.id)} title="Delete">🗑</button>}
-                  </div>
+                  {!row.isSummary && (
+                    <div className="flex gap-1 justify-center">
+                      {onView && <button className="btn btn-ghost btn-xs text-blue-500 hover:bg-blue-50 px-1.5" onClick={() => onView(row)} title="View">👁</button>}
+                      {onEdit && <button className="btn btn-ghost btn-xs text-amber-500 hover:bg-amber-50 px-1.5" onClick={() => onEdit(row)} title="Edit">✏️</button>}
+                      {onDelete && <button className="btn btn-ghost btn-xs text-red-500 hover:bg-red-50 px-1.5" onClick={() => onDelete(row.id)} title="Delete">🗑</button>}
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}

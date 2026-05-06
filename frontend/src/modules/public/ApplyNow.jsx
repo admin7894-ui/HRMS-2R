@@ -26,8 +26,8 @@ const INIT = {
   company_id:'', First_Name:'', Last_Name:'', Middle_Name:'', Date_of_Birth:'', Gender:'', Marital_Status:'', Nationality:'',
   Email_ID:'', Phone_Number:'', Alternate_Phone:'', Emergency_Contact_Name:'', Emergency_Contact_Number:'',
   Address_Line1:'', Address_Line2:'', City:'', State:'', Country:'', Pincode:'',
-  Aadhaar_Number:'', PAN_Number:'', Aadhaar_File:'', PAN_File:'', Photo_File:'', Other_Doc_File:'',
-  Qualification:'', Degree_Name:'', Specialization:'', University_Name:'', Institute_Name:'', Edu_Start_Year:'', Edu_End_Year:'', Passing_Year:'', Percentage:'', Edu_Grade:'',
+  Aadhaar_Number:'', PAN_Number:'', Aadhaar_File:'', PAN_File:'', Photo_File:'', Resume_File:'',
+  Qualification:'', Qualification_Other: '', Specialization:'', University_Name:'', Institute_Name:'', Edu_Start_Year:'', Edu_End_Year:'', Passing_Year:'', Percentage:'', Edu_Grade:'',
   Is_Fresher: false, Prev_Company_Name:'', Prev_Designation:'', Prev_Department:'', Industry_Type:'',
   Exp_Start_Date:'', Exp_End_Date:'', Total_Experience:'', Last_Drawn_Salary:'', Reason_For_Leaving:'',
   Nominee_Name:'', Nominee_Relationship:'', Nominee_Date_of_Birth:'', Nominee_Contact_Number:'',
@@ -66,7 +66,10 @@ function validateStep(step, form) {
     if (!form.Photo_File) e.Photo_File = 'Required';
   } else if (step === 4) {
     if (!form.Qualification) e.Qualification = 'Required';
-    if (!RE.degr.test(form.Degree_Name)) e.Degree_Name = 'Required, 2–100 chars';
+    if (form.Qualification === 'Other') {
+      if (!form.Qualification_Other) e.Qualification_Other = 'Required';
+      else if (!/^[a-zA-Z\s]{1,50}$/.test(form.Qualification_Other)) e.Qualification_Other = 'Max 50 characters, only alphabets and spaces allowed';
+    }
     if (!form.Specialization) e.Specialization = 'Required';
     if (!RE.degr.test(form.University_Name)) e.University_Name = 'Required';
     if (!RE.degr.test(form.Institute_Name)) e.Institute_Name = 'Required';
@@ -194,7 +197,7 @@ export default function ApplyNow() {
   useEffect(() => {
     const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/public';
     axios.get(apiBase + '/job-postings')
-      .then(res => setJobPostings((res.data?.data || res.data || []).map(j => ({ v: j.id, l: j.Posting_Title }))))
+      .then(res => setJobPostings(res.data?.data || res.data || []))
       .catch(() => {});
     axios.get(apiBase + '/companies')
       .then(res => setCompanies((res.data?.data || res.data || []).map(c => ({ v: c.id, l: c.Company_Name }))))
@@ -217,7 +220,12 @@ export default function ApplyNow() {
     if (Object.keys(e).length) { setErrors(e); return; }
     setSubmitting(true);
     try {
-      await axios.post(API, { ...form, Application_Status: 'APPLIED' });
+      // If qualification is other, prepend it or handle as needed. 
+      // For consistency, we send it as part of the payload.
+      const payload = { ...form, Application_Status: 'APPLIED' };
+      if (form.Qualification === 'Other') payload.Qualification = form.Qualification_Other;
+
+      await axios.post(API, payload);
       setDone(true);
     } catch {
       alert('Submission failed. Please try again.');
@@ -273,7 +281,7 @@ export default function ApplyNow() {
         <FileField f={f} k='Aadhaar_File' label='Aadhaar Card *' accept='.pdf,.jpg,.jpeg,.png' maxMB={2}/>
         <FileField f={f} k='PAN_File' label='PAN Card *' accept='.pdf,.jpg,.jpeg,.png' maxMB={2}/>
         <FileField f={f} k='Photo_File' label='Passport Photo *' accept='.jpg,.jpeg,.png' maxMB={1}/>
-        <FileField f={f} k='Other_Doc_File' label='Other Document' accept='.pdf,.jpg,.jpeg,.png' maxMB={5}/>
+        <FileField f={f} k='Resume_File' label='Resume *' accept='.pdf,.jpg,.jpeg,.png' maxMB={5}/>
       </div>
     </div>,
     // 4 Education
@@ -281,7 +289,9 @@ export default function ApplyNow() {
       <div style={S.sh2}>{icons[4]} Education</div>
       <div style={S.grid}>
         <Sel f={f} k='Qualification' label='Qualification *' opts={QUAL_OPT}/>
-        <Inp f={f} k='Degree_Name' label='Degree *'/>
+        {form.Qualification === 'Other' && (
+          <Inp f={f} k='Qualification_Other' label='Manual Qualification Entry *' placeholder='e.g. B.Tech Honours'/>
+        )}
         <Sel f={f} k='Specialization' label='Specialization *' opts={SPEC_OPT}/>
         <Inp f={f} k='University_Name' label='University *'/>
         <Inp f={f} k='Institute_Name' label='Institute *'/>
@@ -329,7 +339,12 @@ export default function ApplyNow() {
     <div>
       <div style={S.sh2}>🏢 Application Info</div>
       <div style={S.grid}>
-        <Sel f={f} k='HRMS_Job_Posting_ID' label='Job Posting *' opts={jobPostings}/>
+        <Sel f={f} k='HRMS_Job_Posting_ID' label='Job Posting *' 
+          opts={jobPostings
+            .filter(j => !form.company_id || j.company_id === form.company_id || j.Company_ID === form.company_id)
+            .map(j => ({ v: j.id, l: j.Posting_Title }))
+          }
+        />
         <Inp f={f} k='Expected_Salary' label='Expected Salary' placeholder='e.g. 500000'/>
         <Sel f={f} k='Source' label='Source' opts={SOURCE_OPT}/>
         <Inp f={f} k='Applied_Date' label='Applied Date' type='date' readOnly disabled/>

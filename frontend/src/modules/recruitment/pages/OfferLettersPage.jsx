@@ -13,8 +13,8 @@ export default function OfferLettersPage() {
     ]}
     fields={[
       {key:'HRMS_Application_ID',label:'Application',required:true,type:'lov',lovEndpoint:'applications',labelFn:o=>`${o.First_Name} ${o.Last_Name}`,section:'References'},
-      {key:'HRMS_Applicant_ID',label:'Applicant',required:true,type:'lov',lovEndpoint:'applicants',labelFn:o=>`${o.First_Name} ${o.Last_Name}`,section:'References'},
-      {key:'HRMS_Requisition_ID',label:'Requisition',required:true,type:'lov',lovEndpoint:'requisitions',labelFn:o=>o._displayId||o.id,section:'References'},
+      {key:'HRMS_Applicant_ID',label:'Applicant',required:true,type:'lov',lovEndpoint:'applicants',labelFn:o=>`${o.First_Name} ${o.Last_Name}`,section:'References', tooltip: 'Auto-filled from Application'},
+      {key:'HRMS_Requisition_ID',label:'Requisition',required:true,type:'lov',lovEndpoint:'requisitions',labelFn:o=> `${o._displayId || o.id} - ${o.Position_Name || o._positionName || 'No Position'}`,section:'References'},
       {key:'HRMS_Position_ID',label:'Position',required:true,type:'lov',lovEndpoint:'positions',labelFn:o=>o.Position_Name,section:'References'},
       {key:'HRMS_Consent_Letter_ID',label:'Consent letter',required:true,type:'lov',lovEndpoint:'consent-letters',labelFn:o=>o._displayId||o.id,section:'References'},
       {key:'HRMS_Template_Assignment_ID',label:'Template assignment',required:true,type:'lov',lovEndpoint:'template-assignments',labelFn:o=>o._displayId||o.id,section:'References'},
@@ -31,44 +31,69 @@ export default function OfferLettersPage() {
 
       useEffect(() => {
         const appId = form.HRMS_Application_ID;
-        if (!appId || appId === prevAppId.current) return;
-        prevAppId.current = appId;
-
-        api.get(`/applications/${appId}`).then(res => {
-          const app = res?.data || res || {};
-          const applicantId = app.HRMS_Applicant_ID ?? app.Applicant_ID ?? app.applicant_id;
-          const requisitionId = app.HRMS_Requisition_ID ?? app.Requisition_ID ?? app.requisition_id;
-          const jobPostingId = app.HRMS_Job_Posting_ID ?? app.Job_Posting_ID ?? app.job_posting_id;
-
-          // Populate only if data exists; keep editable (user can change later)
-          if (jobPostingId) {
-            api.get(`/job-postings/${jobPostingId}`).then(r2 => {
-              const posting = r2?.data || r2 || {};
-              const posId = posting.HRMS_Position_ID ?? posting.Position_ID ?? posting.position_id;
-              setForm(p => ({
-                ...p,
-                HRMS_Application_ID: appId,
-                ...(applicantId ? { HRMS_Applicant_ID: applicantId } : {}),
-                ...(requisitionId ? { HRMS_Requisition_ID: requisitionId } : {}),
-                ...(posId ? { HRMS_Position_ID: posId } : {}),
-              }));
-            }).catch(() => {
-              setForm(p => ({
-                ...p,
-                HRMS_Application_ID: appId,
-                ...(applicantId ? { HRMS_Applicant_ID: applicantId } : {}),
-                ...(requisitionId ? { HRMS_Requisition_ID: requisitionId } : {}),
-              }));
-            });
-          } else {
+        // Reset if application is cleared
+        if (!appId) {
+          if (prevAppId.current) {
             setForm(p => ({
               ...p,
-              HRMS_Application_ID: appId,
-              ...(applicantId ? { HRMS_Applicant_ID: applicantId } : {}),
-              ...(requisitionId ? { HRMS_Requisition_ID: requisitionId } : {}),
+              HRMS_Applicant_ID: '',
+              HRMS_Requisition_ID: '',
+              HRMS_Position_ID: '',
+              HRMS_Consent_Letter_ID: '',
+              HRMS_Template_Assignment_ID: '',
             }));
           }
-        }).catch(() => {});
+          prevAppId.current = null;
+          return;
+        }
+        if (appId === prevAppId.current) return;
+        prevAppId.current = appId;
+
+        // Reset dependent fields immediately on change to ensure clean state and prevent mismatch
+        setForm(p => ({
+          ...p,
+          HRMS_Applicant_ID: '',
+          HRMS_Requisition_ID: '',
+          HRMS_Position_ID: '',
+          HRMS_Consent_Letter_ID: '',
+          HRMS_Template_Assignment_ID: '',
+        }));
+
+        // Parallel fetch for all linked entities to ensure consistency
+        Promise.all([
+          api.get(`/applications/${appId}`),
+          api.get('/consent-letters', { params: { HRMS_Application_ID: appId } }),
+          api.get('/template-assignments', { params: { HRMS_Application_ID: appId } })
+        ]).then(async ([appRes, clRes, taRes]) => {
+          const app = appRes?.data || appRes || {};
+          const clList = clRes?.data || clRes || [];
+          const taList = taRes?.data || taRes || [];
+          
+          // Pick the first matching record if exists
+          const consent = clList.find(x => x.HRMS_Application_ID === appId);
+          const assignment = taList.find(x => x.HRMS_Application_ID === appId);
+
+          const updates = {
+            // Strictly link applicant to the selected application
+            HRMS_Applicant_ID: app.HRMS_Applicant_ID || '',
+            HRMS_Requisition_ID: app.HRMS_Requisition_ID || '',
+            HRMS_Consent_Letter_ID: consent?.id || '',
+            HRMS_Template_Assignment_ID: assignment?.id || '',
+          };
+
+          // Also resolve Position from Job Posting if linked
+          if (app.HRMS_Job_Posting_ID) {
+            try {
+              const postingRes = await api.get(`/job-postings/${app.HRMS_Job_Posting_ID}`);
+              const posting = postingRes?.data || postingRes || {};
+              if (posting.HRMS_Position_ID) updates.HRMS_Position_ID = posting.HRMS_Position_ID;
+            } catch (e) {}
+          }
+
+          setForm(p => ({ ...p, ...updates }));
+        }).catch(err => {
+          console.error('Offer Letter Auto-fill Error:', err);
+        });
       }, [form.HRMS_Application_ID, setForm]);
 
       return null;

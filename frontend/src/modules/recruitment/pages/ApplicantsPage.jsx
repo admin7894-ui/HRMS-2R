@@ -32,6 +32,7 @@ function ApplicantAutoFill({ form, setForm }) {
         assignIfPresent('Aadhar_Card_Upload', app.Aadhar_Upload ?? app.Aadhaar_File);
         assignIfPresent('PAN_Card_Upload', app.PAN_Upload ?? app.PAN_File);
         assignIfPresent('Passport_Size_Upload', app.Photo_Upload ?? app.Photo_File);
+        assignIfPresent('Resume_Upload', app.Resume_File);
 
         return updates;
       });

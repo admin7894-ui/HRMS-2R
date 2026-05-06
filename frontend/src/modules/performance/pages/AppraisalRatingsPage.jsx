@@ -45,7 +45,7 @@ export default function AppraisalRatingsPage() {
   const loadEA = async eaId => {
     if (!eaId) { setEaData(null); setHrRatings({}); return; }
     try {
-      const ea = (lovData['employee-appraisals'] || []).find(e => e.id === eaId);
+      const ea = (eaOptions || []).find(e => e.id === eaId);
       if (ea && ea.key_area_ratings) {
         setEaData(ea);
         const init = {};
@@ -62,9 +62,32 @@ export default function AppraisalRatingsPage() {
     } catch (e) { setEaData(null); }
   };
 
+  const [eaOptions, setEaOptions] = useState([]);
+
+  useEffect(() => {
+    const cid = form.company_id;
+    if (!cid) {
+      setEaOptions([]);
+      return;
+    }
+    // Fetch employee appraisals filtered by company
+    api.get('/employee-appraisals', { params: { company_id: cid, limit: 1000 } })
+      .then(r => setEaOptions(r.data || []))
+      .catch(() => setEaOptions([]));
+  }, [form.company_id]);
+
   const handleChange = e => {
     const { name, value } = e.target;
-    setForm(p => ({ ...p, [name]: value }));
+    setForm(p => {
+      const next = { ...p, [name]: value };
+      if (name === 'company_id') {
+        // Clear appraisal if company changes
+        next.HRMS_employee_appraisal_id = '';
+        setEaData(null);
+        setHrRatings({});
+      }
+      return next;
+    });
     if (name === 'HRMS_employee_appraisal_id') loadEA(value);
     if (errors[name]) setErrors(p => ({ ...p, [name]: '' }));
   };
@@ -147,7 +170,7 @@ export default function AppraisalRatingsPage() {
           <p className="fsec-title">Select employee appraisal</p>
           <LOV label="Employee appraisal" name="HRMS_employee_appraisal_id" value={form.HRMS_employee_appraisal_id || ''}
             onChange={handleChange} error={errors.HRMS_employee_appraisal_id} required
-            options={lovData['employee-appraisals'] || []}
+            options={eaOptions}
             labelFn={o => { const n = o._empName || ''; return n ? `${n} - ${o.review_period || o.HRMS_appraisal_id || ''}` : o._displayId || o.id; }}
             tooltip="Shows Employee Name + Appraisal Period" />
         </div>

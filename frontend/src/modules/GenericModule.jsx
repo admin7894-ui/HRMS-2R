@@ -13,6 +13,7 @@ const GenericModule = ({
   defaultForm = {}, filterCols = [],
   extraForm,
   customValidate,
+  dataTransformer,
 }) => {
   const { user } = useAuth();
   const [data, setData] = useState([]);
@@ -86,7 +87,11 @@ const GenericModule = ({
     setLoading(true);
     try {
       const r = await crud.list({ page, limit: perPage, ...(search ? { q: search } : {}), ...(sortBy ? { sortBy, sortOrder } : {}) });
-      setData(r.data || []);
+      let fetchedData = r.data || [];
+      if (dataTransformer) {
+        fetchedData = dataTransformer(fetchedData);
+      }
+      setData(fetchedData);
       setTotal(r.total || 0);
       setPages(r.pages || 1);
     } catch (e) { toast.error(e.message || 'Load failed'); }
@@ -333,9 +338,36 @@ const GenericModule = ({
     if (f.type === 'file') return (
       <Field key={f.key} label={f.label} error={er} required={f.required} tooltip={f.tooltip}>
         <input type="file" name={f.key}
-          onChange={e => handleChange({ target: { name: f.key, value: e.target.files[0]?.name || '' } })}
+          onChange={async e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            setLoading(true);
+            try {
+              const fd = new FormData();
+              fd.append('file', file);
+              // Use the central upload endpoint
+              const r = await api.post('/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+              const url = r.data?.url || r.url || file.name;
+              handleChange({ target: { name: f.key, value: url } });
+              toast.success('File uploaded successfully');
+            } catch (err) {
+              toast.error('Upload failed: ' + (err.response?.data?.message || err.message));
+            } finally {
+              setLoading(false);
+            }
+          }}
           className="input py-1.5" accept={f.accept || '*'}/>
-        {val && <p className="hint">📎 {val}</p>}
+        {val && (
+          <p className="hint flex items-center gap-2 mt-1">
+            📎 {typeof val === 'string' && (val.includes('/') || val.includes('\\')) ? (
+              <a href={val.startsWith('http') ? val : `http://localhost:5000${val}`} 
+                 target="_blank" rel="noreferrer" 
+                 className="text-primary-600 underline font-medium hover:text-primary-800">
+                View/Download: {val.split(/[/\\]/).pop()}
+              </a>
+            ) : <span>{val}</span>}
+          </p>
+        )}
       </Field>
     );
     if (f.type === 'readonly' || f.type === 'code') return (

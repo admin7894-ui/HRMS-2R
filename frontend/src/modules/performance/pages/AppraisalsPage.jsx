@@ -3,43 +3,134 @@ import GenericModule from '../../GenericModule';
 import api from '../../../utils/api';
 
 function AppraisalAutoFill({ form, setForm, setOptions }) {
-  const prevEmpId = useRef(null);
-  const prevRatingKey = useRef('');
-
-  useEffect(() => {
-    const eid = form.HRMS_employee_id;
-    if (eid && eid !== prevEmpId.current) {
-      prevEmpId.current = eid;
-      api.get(`/employees/${eid}/assignments`).then(res => {
-        const asns = res?.data || [];
-        setOptions(asns.map(a => ({ v: a.id, l: a._displayId || a.id })));
-        const picked = [...asns].sort((a, b) =>
-          String(b.updated_at || b.created_at || '').localeCompare(String(a.updated_at || a.created_at || ''))
-        )[0];
-        setForm(p => ({ ...p, HRMS_assignment_id: picked?.id || '' }));
-      }).catch(() => {});
-    } else if (!eid && prevEmpId.current) {
-      prevEmpId.current = null;
-      setOptions([]);
-      setForm(p => ({ ...p, HRMS_assignment_id: '' }));
-    }
-  }, [form.HRMS_employee_id, setForm, setOptions]);
+  const prevKey = useRef('');
+  const prevAsnId = useRef(null);
+  const prevLadderId = useRef(null);
 
   useEffect(() => {
     const eid = form.HRMS_employee_id;
     const cycleId = form.HRMS_appraisal_cycle_id;
     const key = `${eid || ''}:${cycleId || ''}`;
-    if (!eid || !cycleId || key === prevRatingKey.current) return;
-    prevRatingKey.current = key;
-    api.get(`/appraisal-ratings?employee_id=${eid}&appraisal_cycle_id=${cycleId}&limit=500`).then(res => {
-      const ratings = res.data || [];
-      if (ratings.length === 0) return;
-      const numeric = ratings.map(r => parseFloat(r.avg_hr_rating)).filter(v => !Number.isNaN(v));
-      if (numeric.length === 0) return;
-      const average = (numeric.reduce((sum, value) => sum + value, 0) / numeric.length).toFixed(2);
-      setForm(p => ({ ...p, overall_rating: average }));
-    }).catch(() => {});
-  }, [form.HRMS_employee_id, form.HRMS_appraisal_cycle_id, setForm]);
+
+    // Requirement 3: Reset when either changes
+    if (key !== prevKey.current) {
+      prevKey.current = key;
+      // Skip reset if it's initial load of an existing record
+      if (form.id) return;
+
+      setForm(p => ({
+        ...p,
+        HRMS_assignment_id: '',
+        reviewer_employee_id: '',
+        overall_rating: '',
+        HRMS_template_master_id: '',
+        review_period: '',
+        recommendation: '',
+        current_grade_id: '',
+        recommended_grade_id: ''
+      }));
+
+      // Requirement 1: Only fetch if BOTH are selected
+      if (!eid || !cycleId) {
+        setOptions([]);
+        return;
+      }
+
+      // Fetch assignments for the employee (needed for the dropdown)
+      api.get(`/employees/${eid}/assignments`).then(res => {
+        const asns = res?.data || [];
+        setOptions(asns.map(a => ({ v: a.id, l: a._displayId || a.id })));
+        const latestAsn = [...asns].sort((a, b) =>
+          String(b.updated_at || b.created_at || '').localeCompare(String(a.updated_at || a.created_at || ''))
+        )[0];
+
+        // Requirement 2: Fetch LATEST previous appraisal for this employee + cycle
+        api.get(`/appraisals?HRMS_employee_id=${eid}&HRMS_appraisal_cycle_id=${cycleId}&sortBy=created_at&sortOrder=desc&limit=1`).then(aRes => {
+          const latestAppr = aRes.data?.[0];
+          
+          // Requirement: Auto-fetch average HR rating from Appraisal Ratings table
+          api.get('/appraisal-ratings', { params: { employee_id: eid, appraisal_cycle_id: cycleId, limit: 1 } }).then(arRes => {
+            const ar = arRes.data?.[0];
+            const avgRating = ar ? ar.avg_hr_rating : '';
+
+            if (latestAppr) {
+              setForm(p => ({
+                ...p,
+                HRMS_assignment_id: latestAppr.HRMS_assignment_id || latestAsn?.id || '',
+                reviewer_employee_id: latestAppr.reviewer_employee_id || '',
+                overall_rating: avgRating || latestAppr.overall_rating || '',
+                HRMS_template_master_id: latestAppr.HRMS_template_master_id || '',
+                review_period: latestAppr.review_period || '',
+                recommendation: latestAppr.recommendation || ''
+              }));
+            } else {
+              setForm(p => ({ 
+                ...p, 
+                HRMS_assignment_id: latestAsn?.id || '',
+                overall_rating: avgRating || ''
+              }));
+            }
+          }).catch(() => {
+            // Fallback if appraisal-ratings fetch fails
+            if (latestAppr) {
+              setForm(p => ({
+                ...p,
+                HRMS_assignment_id: latestAppr.HRMS_assignment_id || latestAsn?.id || '',
+                reviewer_employee_id: latestAppr.reviewer_employee_id || '',
+                overall_rating: latestAppr.overall_rating || '',
+                HRMS_template_master_id: latestAppr.HRMS_template_master_id || '',
+                review_period: latestAppr.review_period || '',
+                recommendation: latestAppr.recommendation || ''
+              }));
+            } else {
+              setForm(p => ({ ...p, HRMS_assignment_id: latestAsn?.id || '' }));
+            }
+          });
+        });
+      }).catch(() => { });
+    }
+  }, [form.HRMS_employee_id, form.HRMS_appraisal_cycle_id, form.id, setForm, setOptions]);
+
+  // Fetch Current Grade when Assignment changes
+  useEffect(() => {
+    const asid = form.HRMS_assignment_id;
+    if (asid && asid !== prevAsnId.current) {
+      prevAsnId.current = asid;
+      api.get(`/assignments/${asid}`).then(res => {
+        const asn = res.data;
+        if (asn) {
+          let gradeId = asn.HRMS_grade_id || asn.grade_id;
+          if (!gradeId && asn.HRMS_position_id) {
+            api.get(`/positions/${asn.HRMS_position_id}`).then(pRes => {
+              setForm(p => ({ ...p, current_grade_id: pRes.data?.HRMS_grade_id || '' }));
+            });
+          } else {
+            setForm(p => ({ ...p, current_grade_id: gradeId || '' }));
+          }
+        }
+      }).catch(() => { });
+    }
+  }, [form.HRMS_assignment_id, setForm]);
+
+  // Fetch Recommended Grade when Grade Ladder changes
+  useEffect(() => {
+    const glid = form.HRMS_grade_ladder_id;
+    const curGrade = form.current_grade_id;
+    if (glid && (glid !== prevLadderId.current || curGrade !== (setForm.prevCurGrade || ''))) {
+      prevLadderId.current = glid;
+      setForm.prevCurGrade = curGrade;
+      api.get(`/grade-ladders/${glid}`).then(res => {
+        const ladder = res.data;
+        if (ladder && String(ladder.HRMS_From_Grade_ID) === String(curGrade)) {
+          setForm(p => ({ ...p, recommended_grade_id: ladder.HRMS_To_Grade_ID || '' }));
+        } else {
+          setForm(p => ({ ...p, recommended_grade_id: '' }));
+        }
+      }).catch(() => { });
+    } else if (!glid) {
+      setForm(p => ({ ...p, recommended_grade_id: '' }));
+    }
+  }, [form.HRMS_grade_ladder_id, form.current_grade_id, setForm]);
 
   return null;
 }
@@ -69,6 +160,8 @@ export default function AppraisalsPage() {
       { key: 'HRMS_appraisal_cycle_id', label: 'Appraisal cycle', type: 'lov', lovEndpoint: 'appraisal-cycles', labelFn: o => o.cycle_name },
       { key: 'HRMS_employee_id', label: 'Employee', required: true, type: 'lov', lovEndpoint: 'employees', labelFn: o => `${o.First_Name} ${o.Last_Name}`, tooltip: 'Shows employee name, not internal code' },
       { key: 'HRMS_assignment_id', label: 'Assignment', required: true, type: 'select', options: asnOptions, readOnly: true, tooltip: 'Auto-filled from selected employee assignment ID' },
+      { key: 'HRMS_grade_ladder_id', label: 'Grade ladder', type: 'lov', lovEndpoint: 'grade-ladders', labelFn: o => o.Ladder_Name },
+      { key: 'current_grade_id', label: 'Current grade', type: 'lov', lovEndpoint: 'grades', labelFn: o => o.Grade_Name, readOnly: true },
       { key: 'HRMS_template_master_id', label: 'Template', type: 'lov', lovEndpoint: 'template-masters', labelFn: o => o.Template_Name },
       { key: 'review_period', label: 'Review period', type: 'select', options: REVIEW_PERIOD },
       { key: 'reviewer_employee_id', label: 'Reviewer', type: 'lov', lovEndpoint: 'employees', labelFn: o => `${o.First_Name} ${o.Last_Name}` },

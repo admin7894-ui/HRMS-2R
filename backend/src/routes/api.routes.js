@@ -370,6 +370,7 @@ r.get('/interviews', (req, res) => {
     let all = db.interviews || [];
     if (req.query.q) { const lq = req.query.q.toLowerCase(); all = all.filter(x => String(x.Interview_Status??'').toLowerCase().includes(lq)); }
     all = applyEmployeeIdFilter(all, req.query.employee_id, 'interviews');
+    const skip = new Set(['q', 'page', 'limit', 'sortBy', 'sortOrder', 'employee_id']);
     Object.entries(req.query).forEach(([k,v]) => { if (!skip.has(k) && v) { const vals = Array.isArray(v)?v:[v]; all = all.filter(x => vals.some(vv => String(x[k]??'').toLowerCase() === vv.toLowerCase())); } });
     if (req.query.sortBy) { const dir = req.query.sortOrder==='desc'?-1:1; all = [...all].sort((a,b) => String(a[req.query.sortBy]??'').localeCompare(String(b[req.query.sortBy]??''),undefined,{numeric:true})*dir); }
     all = all.map(x => {
@@ -514,7 +515,28 @@ r.put('/hire-records/:id',              hrCtrl.update);
 r.delete('/hire-records/:id',           hrCtrl.remove);
 r.patch('/hire-records/:id/toggle-status', hrCtrl.toggleStatus);
 
-wire('employees',            'employees',            ['First_Name', 'Last_Name', 'Email_ID']);
+const empCtrl = makeController('employees', ['First_Name', 'Last_Name', 'Email_ID']);
+r.get('/employees', empCtrl.list);
+r.get('/employees/:id', empCtrl.get);
+r.post('/employees', (req, res) => {
+  try {
+    const body = { ...req.body, _displayId: genId('EMP', 'employees'), active_flag: 'Y', created_by: req.user?.username, updated_by: req.user?.username };
+    const saved = create('employees', body);
+    insertEmployeeHistory({
+      HRMS_employee_id: saved.id,
+      change_type: 'Hire',
+      field_changed: 'Employment Status',
+      old_value: 'NULL',
+      new_value: 'Active',
+      changed_by: req.user?.username,
+      orgContext: saved
+    });
+    ok(res, saved, 'Created', 201);
+  } catch (e) { err(res, e.message, 500); }
+});
+r.put('/employees/:id', empCtrl.update);
+r.delete('/employees/:id', empCtrl.remove);
+r.patch('/employees/:id/toggle-status', empCtrl.toggleStatus);
 // Bank Accounts — enrich with _empName
 const baCtrl = makeController('bank_accounts', ['Bank_Name', 'Account_Number']);
 r.get('/bank-accounts', (req, res) => {
@@ -592,7 +614,37 @@ r.get('/assignments', (req, res) => {
 });
 r.get('/assignments/:id',              asgCtrl.get);
 r.post('/assignments',                 asgCtrl.create);
-r.put('/assignments/:id',              asgCtrl.update);
+r.put('/assignments/:id', (req, res) => {
+  try {
+    const before = getById('assignments', req.params.id);
+    if (!before) return err(res, 'Not found', 404);
+    const saved = update('assignments', req.params.id, { ...req.body, updated_at: new Date().toISOString() });
+    
+    // Compare and Log History
+    const checks = [
+      { f: 'HRMS_department_id', t: 'Department Transfer', l: 'Department', res: departmentName },
+      { f: 'HRMS_position_id',   t: 'Position Change',    l: 'Position',   res: id => (db.positions||[]).find(p=>p.id===id)?.Position_Name },
+      { f: 'HRMS_grade_id',      t: 'Grade Change',       l: 'Grade',      res: id => (db.grades||[]).find(g=>g.id===id)?.Grade_Name },
+    ];
+    
+    checks.forEach(c => {
+      if (before[c.f] !== saved[c.f]) {
+        insertEmployeeHistory({
+          HRMS_employee_id: saved.HRMS_employee_id,
+          HRMS_assignment_id: saved.id,
+          change_type: c.t,
+          field_changed: c.l,
+          old_value: c.res(before[c.f]) || before[c.f],
+          new_value: c.res(saved[c.f]) || saved[c.f],
+          changed_by: req.user?.username,
+          orgContext: saved
+        });
+      }
+    });
+    
+    ok(res, saved, 'Updated');
+  } catch(e) { err(res, e.message); }
+});
 r.delete('/assignments/:id',           asgCtrl.remove);
 r.patch('/assignments/:id/toggle-status', asgCtrl.toggleStatus);
 // Supervisors — enrich with _empName, _asnName, _supName
@@ -622,7 +674,27 @@ r.get('/supervisors', (req, res) => {
 });
 r.get('/supervisors/:id',              supCtrl.get);
 r.post('/supervisors',                 supCtrl.create);
-r.put('/supervisors/:id',              supCtrl.update);
+r.put('/supervisors/:id', (req, res) => {
+  try {
+    const before = getById('supervisors', req.params.id);
+    if (!before) return err(res, 'Not found', 404);
+    const saved = update('supervisors', req.params.id, { ...req.body, updated_at: new Date().toISOString() });
+    
+    if (before.supervisor_employee_id !== saved.supervisor_employee_id) {
+      insertEmployeeHistory({
+        HRMS_employee_id: saved.HRMS_employee_id,
+        HRMS_assignment_id: saved.HRMS_assignment_id,
+        change_type: 'Reporting Manager Change',
+        field_changed: 'Supervisor',
+        old_value: employeeName(before.supervisor_employee_id),
+        new_value: employeeName(saved.supervisor_employee_id),
+        changed_by: req.user?.username,
+        orgContext: saved
+      });
+    }
+    ok(res, saved, 'Updated');
+  } catch(e) { err(res, e.message); }
+});
 r.delete('/supervisors/:id',           supCtrl.remove);
 r.patch('/supervisors/:id/toggle-status', supCtrl.toggleStatus);
 // Employee Histories — enrich with Employee_Name so UI can display name instead of raw ID
@@ -777,6 +849,27 @@ const appraisalSummary = appr => {
   return `${cycleName} — Rating: ${rating}`.trim();
 };
 
+const insertEmployeeHistory = ({ HRMS_employee_id, HRMS_assignment_id, change_type, field_changed, old_value, new_value, changed_by, orgContext }) => {
+  return create('employee_histories', {
+    HRMS_employee_id,
+    HRMS_assignment_id: HRMS_assignment_id || orgContext?.HRMS_assignment_id || null,
+    company_id: orgContext?.company_id || 'C1',
+    business_group_id: orgContext?.business_group_id || 'BG1',
+    business_type_id: orgContext?.business_type_id || 'BT1',
+    module_id: orgContext?.module_id || 'MOD1',
+    change_type,
+    field_changed,
+    old_value: old_value ?? '—',
+    new_value: new_value ?? '—',
+    change_date: new Date().toISOString(),
+    changed_by: changed_by || 'system',
+    active_flag: 'Y',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    _displayId: genId('EH', 'employee_histories')
+  });
+};
+
 const insertAppraisalHistory = ({ changeType, appraisal, oldValue, newValue, changedBy }) => {
   return create('employee_histories', {
     HRMS_employee_id: appraisal?.HRMS_employee_id || null,
@@ -794,12 +887,22 @@ const insertAppraisalHistory = ({ changeType, appraisal, oldValue, newValue, cha
     active_flag: 'Y',
     created_by: changedBy || 'system',
     updated_by: changedBy || 'system',
+    _displayId: genId('EH', 'employee_histories')
   });
 };
 
 // Appraisals — auto-sync to Employee History after successful create/update
 r.post('/appraisals', (req, res) => {
   try {
+    const { HRMS_employee_id, HRMS_appraisal_cycle_id, review_period } = req.body;
+    const existing = (db.appraisals || []).find(a => 
+      String(a.HRMS_employee_id) === String(HRMS_employee_id) && 
+      String(a.HRMS_appraisal_cycle_id) === String(HRMS_appraisal_cycle_id) && 
+      String(a.review_period) === String(review_period) &&
+      a.active_flag !== 'N'
+    );
+    if (existing) return err(res, 'Appraisal already exists for this employee for the selected cycle and review period.', 400);
+
     const body = { ...req.body, created_by: req.user?.username, updated_by: req.user?.username, active_flag: 'Y' };
     const saved = create('appraisals', body);
     insertAppraisalHistory({
@@ -827,6 +930,29 @@ r.put('/appraisals/:id', (req, res) => {
       newValue: appraisalSummary(saved),
       changedBy: req.user?.username,
     });
+
+    // Promotion Trigger
+    if (saved.appraisal_status === 'APPROVED' && saved.recommendation === 'PROMOTION') {
+      const asn = (db.assignments || []).find(a => a.id === saved.HRMS_assignment_id);
+      if (asn && saved.recommended_grade_id) {
+        const oldG = (db.grades || []).find(g => g.id === asn.HRMS_grade_id);
+        const newG = (db.grades || []).find(g => g.id === saved.recommended_grade_id);
+        
+        insertEmployeeHistory({
+          HRMS_employee_id: saved.HRMS_employee_id,
+          HRMS_assignment_id: saved.HRMS_assignment_id,
+          change_type: 'Promotion',
+          field_changed: 'Grade',
+          old_value: oldG?.Grade_Name || asn.HRMS_grade_id,
+          new_value: newG?.Grade_Name || saved.recommended_grade_id,
+          changed_by: req.user?.username,
+          orgContext: saved
+        });
+        
+        update('assignments', asn.id, { HRMS_grade_id: saved.recommended_grade_id });
+      }
+    }
+
     ok(res, saved, 'Updated');
   } catch (e) { err(res, e.message, 500); }
 });
@@ -934,7 +1060,28 @@ r.get('/separations', listWith('separations', ['separation_type', 'separation_st
 }));
 r.get('/separations/:id', sepCtrl.get);
 r.post('/separations', sepCtrl.create);
-r.put('/separations/:id', sepCtrl.update);
+r.put('/separations/:id', (req, res) => {
+  try {
+    const before = getById('separations', req.params.id);
+    if (!before) return err(res, 'Not found', 404);
+    const saved = update('separations', req.params.id, { ...req.body, updated_at: new Date().toISOString() });
+    
+    if (saved.separation_status === 'APPROVED' && before.separation_status !== 'APPROVED') {
+      insertEmployeeHistory({
+        HRMS_employee_id: saved.HRMS_employee_id,
+        change_type: 'Termination',
+        field_changed: 'Employment Status',
+        old_value: 'Active',
+        new_value: 'Terminated',
+        changed_by: req.user?.username,
+        orgContext: saved
+      });
+      // Update employee status
+      update('employees', saved.HRMS_employee_id, { active_flag: 'N' });
+    }
+    ok(res, saved, 'Updated');
+  } catch(e) { err(res, e.message); }
+});
 r.delete('/separations/:id', sepCtrl.remove);
 r.patch('/separations/:id/toggle-status', sepCtrl.toggleStatus);
 
