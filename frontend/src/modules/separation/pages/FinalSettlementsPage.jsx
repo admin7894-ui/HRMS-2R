@@ -7,8 +7,10 @@ function FinalSettlementAutoFill({ form, setForm, api }) {
   useEffect(() => {
     const sid = form.HRMS_separation_id;
     if (!sid) {
-      prevSepId.current = null;
-      setForm(p => ({ ...p, HRMS_employee_id: '', HRMS_assignment_id: '' }));
+      if (prevSepId.current !== null) {
+        prevSepId.current = null;
+        setForm(p => ({ ...p, HRMS_employee_id: '', HRMS_assignment_id: '' }));
+      }
       return;
     }
     if (sid === prevSepId.current) return;
@@ -34,6 +36,54 @@ function FinalSettlementAutoFill({ form, setForm, api }) {
     }).catch(() => {});
   }, [form.HRMS_separation_id, setForm, api]);
 
+  useEffect(() => {
+    const pendingSalary = parseFloat(form.pending_salary) || 0;
+    const leaveEncashmentAmount = parseFloat(form.leave_encashment_amount) || 0;
+    const gratuityAmount = parseFloat(form.gratuity_amount) || 0;
+    const bonusDue = parseFloat(form.bonus_due) || 0;
+
+    const totalEarnings = pendingSalary + leaveEncashmentAmount + gratuityAmount + bonusDue;
+
+    const recoveryName = parseFloat(form.recovery_name) || 0;
+    const recoveryOther = parseFloat(form.recovery_other) || 0;
+
+    const totalDeductions = recoveryName + recoveryOther;
+    const netSettlement = totalEarnings - totalDeductions;
+
+    if (
+      parseFloat(form.total_earnings || 0) !== totalEarnings ||
+      parseFloat(form.total_deductions || 0) !== totalDeductions ||
+      parseFloat(form.net_settlement || 0) !== netSettlement
+    ) {
+      setForm(p => ({
+        ...p,
+        total_earnings: totalEarnings,
+        total_deductions: totalDeductions,
+        net_settlement: netSettlement,
+      }));
+    }
+  }, [
+    form.pending_salary,
+    form.leave_encashment_amount,
+    form.gratuity_amount,
+    form.bonus_due,
+    form.recovery_name,
+    form.recovery_other,
+    form.total_earnings,
+    form.total_deductions,
+    form.net_settlement,
+    setForm
+  ]);
+
+  const net = parseFloat(form.net_settlement || 0);
+  if (net < 0) {
+    return (
+      <div className="col-span-full mb-4 p-3 bg-red-50 text-red-600 rounded border border-red-200">
+        Warning: Net Settlement is negative. Total deductions exceed total earnings.
+      </div>
+    );
+  }
+
   return null;
 }
 
@@ -56,11 +106,11 @@ export default function FinalSettlementsPage() {
       {key:'leave_encashment_amount',label:'Leave encashment amount',numeric:true,min:0},
       {key:'gratuity_amount',label:'Gratuity amount',numeric:true,min:0},
       {key:'bonus_due',label:'Bonus due',numeric:true,min:0},
-      {key:'total_earnings',label:'Total earnings',numeric:true,min:0},
+      {key:'total_earnings',label:'Total earnings',numeric:true,min:0,readOnly:true,tooltip:'Auto-calculated: Pending Salary + Leave Encashment Amount + Gratuity Amount + Bonus Due'},
       {key:'recovery_name',label:'Recovery (named)',numeric:true,min:0},
       {key:'recovery_other',label:'Other recovery',numeric:true,min:0},
-      {key:'total_deductions',label:'Total deductions',numeric:true,min:0},
-      {key:'net_settlement',label:'Net settlement',numeric:true},
+      {key:'total_deductions',label:'Total deductions',numeric:true,min:0,readOnly:true,tooltip:'Auto-calculated: Recovery Named + Other Recovery'},
+      {key:'net_settlement',label:'Net settlement',numeric:true,readOnly:true,tooltip:'Auto-calculated: Total Earnings - Total Deductions'},
       {key:'settlement_status',label:'Status',type:'select',options:[{v:'DRAFT',l:'Draft'},{v:'PENDING',l:'Pending'},{v:'APPROVED',l:'Approved'},{v:'PAID',l:'Paid'}]},
     ]}
     extraForm={({ form, setForm, api }) => <FinalSettlementAutoFill form={form} setForm={setForm} api={api} />}

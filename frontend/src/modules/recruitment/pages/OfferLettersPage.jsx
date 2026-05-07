@@ -19,7 +19,7 @@ export default function OfferLettersPage() {
       {key:'HRMS_Consent_Letter_ID',label:'Consent letter',required:true,type:'lov',lovEndpoint:'consent-letters',labelFn:o=>o._displayId||o.id,section:'References'},
       {key:'HRMS_Template_Assignment_ID',label:'Template assignment',required:true,type:'lov',lovEndpoint:'template-assignments',labelFn:o=>o._displayId||o.id,section:'References'},
       {key:'HRMS_Grade_ID',label:'Grade',required:true,type:'lov',lovEndpoint:'grades',labelFn:o=>o.Grade_Name,section:'Compensation'},
-      {key:'Offered_Salary',label:'Salary offered',required:true,type:'lov',lovEndpoint:'salary-amounts',valueKey:'Salary_Amount',labelFn:o=>o.Salary_Amount!=null&&!isNaN(parseFloat(o.Salary_Amount))?'₹'+Number(parseFloat(o.Salary_Amount)).toLocaleString('en-IN')+' '+o.Currency_Code:'—',section:'Compensation'},
+      {key:'Offered_Salary',label:'Salary offered LPA',required:true,type:'lov',lovEndpoint:'salary-amounts',valueKey:'Salary_Amount',labelFn:o=>o.Salary_Amount!=null&&!isNaN(parseFloat(o.Salary_Amount))?'₹'+Number(parseFloat(o.Salary_Amount)).toLocaleString('en-IN')+' '+o.Currency_Code:'—',section:'Compensation'},
       {key:'Joining_Date',label:'Joining date',required:true,type:'date',section:'Dates'},
       {key:'Offer_Date',label:'Offered letter date',required:true,type:'date',section:'Dates'},
       {key:'Offer_Expiry_Date',label:'Offer expiry date',required:true,type:'date',section:'Dates'},

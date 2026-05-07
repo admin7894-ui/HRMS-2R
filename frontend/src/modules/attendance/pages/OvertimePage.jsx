@@ -4,6 +4,26 @@ import api from '../../../utils/api';
 
 function OvertimeAutoFill({ form, setForm }) {
   const prevEmpId = useRef(null);
+  const [holidays, setHolidays] = React.useState([]);
+  const [msg, setMsg] = React.useState(null);
+
+  React.useEffect(() => {
+    api.get('/holidays', { params: { limit: 1000 } }).then(r => setHolidays(r?.data || []));
+  }, []);
+
+  React.useEffect(() => {
+    if (!form.work_date) {
+      setMsg(null);
+      return;
+    }
+    const d = new Date(form.work_date);
+    const isSunday = d.getDay() === 0;
+    const isHoliday = holidays.find(h => h.holiday_date === form.work_date);
+
+    if (isHoliday) setMsg({ type: 'holiday', text: `This date is a holiday (${isHoliday.holiday_name}) — holiday overtime.` });
+    else if (isSunday) setMsg({ type: 'sunday', text: "This date is a Sunday — weekend overtime." });
+    else setMsg(null);
+  }, [form.work_date, holidays]);
 
   useEffect(() => {
     const eid = form.HRMS_employee_id;
@@ -29,7 +49,12 @@ function OvertimeAutoFill({ form, setForm }) {
     }).catch(() => { });
   }, [form.HRMS_employee_id, setForm]);
 
-  return null;
+  return msg ? (
+    <div className="col-span-full mb-4 p-3 bg-blue-50 text-blue-700 rounded border border-blue-100 flex items-center gap-2 text-xs font-medium">
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      {msg.text}
+    </div>
+  ) : null;
 }
 
 // OT: work date not future; hours 1–24; multiplier 1.5/2/3; amount server-calc

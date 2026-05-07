@@ -14,6 +14,8 @@ const GenericModule = ({
   extraForm,
   customValidate,
   dataTransformer,
+  onSuccess,
+  extraActions,
 }) => {
   const { user } = useAuth();
   const [data, setData] = useState([]);
@@ -228,8 +230,12 @@ const GenericModule = ({
     setLoading(true);
     try {
       const body = { ...prepared, updated_by: user?.username || '' };
-      if (editing) { await crud.update(editing.id, body); toast.success(`${title} updated!`); }
-      else { await crud.create(body); toast.success(`${title} created!`); }
+      let res;
+      if (editing) { res = await crud.update(editing.id, body); toast.success(`${title} updated!`); }
+      else { res = await crud.create(body); toast.success(`${title} created!`); }
+      
+      if (onSuccess) await onSuccess(res.data || res, body, !!editing);
+
       closeModal(); load();
     } catch (err) { toast.error(err.message || 'Save failed'); }
     finally { setLoading(false); }
@@ -408,7 +414,7 @@ const GenericModule = ({
     <div>
       <div className="card">
         <TblHeader title={title} search={search} onSearch={setSearch} onAdd={openCreate}
-          addLabel={`Add ${title.toLowerCase()}`} filterCols={filterCols} data={data}/>
+          addLabel={`Add ${title.toLowerCase()}`} filterCols={filterCols} data={data} extraActions={extraActions}/>
         <DataTable cols={columns} data={data} loading={loading}
           onEdit={openEdit} onDelete={destroy} onView={openView} onToggleStatus={toggleStatus}
           sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort}/>

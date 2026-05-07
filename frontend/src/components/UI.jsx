@@ -277,7 +277,10 @@ export const ViewModal = ({ open, onClose, title, record, cols, sections, fields
     if (!fields || fields.length === 0) return null;
     const grouped = {};
     const noSection = [];
-    fields.filter(f => !f.hidden).forEach(f => {
+    fields.filter(f => {
+      const h = typeof f.hidden === 'function' ? f.hidden(record) : f.hidden;
+      return !h;
+    }).forEach(f => {
       if (f.section) { if (!grouped[f.section]) grouped[f.section] = []; grouped[f.section].push(f); }
       else noSection.push(f);
     });
@@ -459,7 +462,7 @@ export const Pagination = ({ page, pages, total, perPage, setPage, setPerPage })
 };
 
 // ── Table Header ─────────────────────────────────────────────────────────────
-export const TblHeader = ({ title, search, onSearch, onAdd, addLabel = 'Add new', filterCols = [], data = [] }) => {
+export const TblHeader = ({ title, search, onSearch, onAdd, addLabel = 'Add new', filterCols = [], data = [], extraActions }) => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [localF, setLocalF] = useState({});
   const [applied, setApplied] = useState({});
@@ -513,6 +516,7 @@ export const TblHeader = ({ title, search, onSearch, onAdd, addLabel = 'Add new'
             )}
           </div>
         )}
+        {extraActions && extraActions()}
         {onAdd && <button className="btn-primary btn-sm btn whitespace-nowrap" onClick={onAdd}>+ {addLabel}</button>}
       </div>
     </div>
