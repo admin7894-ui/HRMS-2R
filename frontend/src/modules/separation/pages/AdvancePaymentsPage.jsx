@@ -2,6 +2,28 @@ import React, { useEffect } from 'react';
 import GenericModule from '../../GenericModule';
 
 function AdvancePaymentLogic({ form, setForm, api, editing }) {
+  // Auto-calculation for installments
+  useEffect(() => {
+    if (form.recovery_type === 'LUMP_SUM') {
+      const adv = parseFloat(form.advance_amount) || 0;
+      if (form.total_installments !== 1 || parseFloat(form.installment_amount) !== adv) {
+        setForm(p => ({ ...p, total_installments: 1, installment_amount: adv }));
+      }
+    } else if (form.recovery_type === 'INSTALLMENT') {
+      const dur = parseFloat(form.recovery_duration) || 0;
+      const unit = form.recovery_duration_unit;
+      const adv = parseFloat(form.advance_amount) || 0;
+      
+      if (dur > 0 && unit && adv > 0) {
+        const total = unit === 'YEARS' ? dur * 12 : dur;
+        const amount = (adv / total).toFixed(2);
+        if (parseFloat(form.total_installments) !== total || parseFloat(form.installment_amount) !== parseFloat(amount)) {
+          setForm(p => ({ ...p, total_installments: total, installment_amount: amount }));
+        }
+      }
+    }
+  }, [form.recovery_type, form.recovery_duration, form.recovery_duration_unit, form.advance_amount, setForm]);
+
   useEffect(() => {
     if (editing) {
       // Fetch recovery schedules for this advance to calculate Recovered Amount
@@ -34,17 +56,7 @@ function AdvancePaymentLogic({ form, setForm, api, editing }) {
     }
   }, [editing?.id, form.advance_amount, form.advance_status, setForm, api]);
 
-  // Validation: Installment Amount × Total Installments = Advance Amount
-  const adv = parseFloat(form.advance_amount) || 0;
-  const inst = parseFloat(form.installment_amount) || 0;
-  const total = parseFloat(form.total_installments) || 0;
-  const showWarning = adv > 0 && inst > 0 && total > 0 && Math.abs(inst * total - adv) > 0.01;
-
-  return showWarning ? (
-    <div className="col-span-full mb-4 p-3 bg-yellow-50 text-yellow-700 rounded border border-yellow-200 text-xs">
-      ⚠️ Warning: Installment Amount × Total Installments ({ (inst * total).toFixed(2) }) does not equal Advance Amount ({ adv.toFixed(2) }).
-    </div>
-  ) : null;
+  return null;
 }
 
 export default function AdvancePaymentsPage() {
@@ -77,8 +89,10 @@ export default function AdvancePaymentsPage() {
       {key:'approved_date',label:'Approved date',type:'date'},
       {key:'disbursement_date',label:'Disbursement date',type:'date'},
       {key:'recovery_type',label:'Recovery type',required:true,type:'select',options:[{v:'LUMP_SUM',l:'Lump sum'},{v:'INSTALLMENT',l:'Installment'}]},
-      {key:'installment_amount',label:'Installment amount',required:true,numeric:true,min:0},
-      {key:'total_installments',label:'Total installments',required:true,numeric:true,min:1},
+      {key:'recovery_duration',label:'Recovery duration',required:true,numeric:true,min:1,hidden:f=>f.recovery_type!=='INSTALLMENT'},
+      {key:'recovery_duration_unit',label:'Duration unit',required:true,type:'select',options:[{v:'MONTHS',l:'Months'},{v:'YEARS',l:'Years'}],hidden:f=>f.recovery_type!=='INSTALLMENT'},
+      {key:'installment_amount',label:'Installment amount',required:true,numeric:true,readOnly:true,hidden:f=>f.recovery_type==='LUMP_SUM',help:'Auto-calculated based on duration'},
+      {key:'total_installments',label:'Total installments',required:true,numeric:true,readOnly:true,hidden:f=>f.recovery_type==='LUMP_SUM',help:'Auto-calculated based on duration'},
       {key:'recovered_amount',label:'Recovered amount',numeric:true,min:0,readOnly:true,hidden:f=>!f.id},
       {key:'remaining_balance',label:'Remaining balance',numeric:true,min:0,readOnly:true,hidden:f=>!f.id},
       {key:'approval_status',label:'Approval status',type:'select',options:[{v:'PENDING',l:'Pending'},{v:'APPROVED',l:'Approved'},{v:'REJECTED',l:'Rejected'}]},

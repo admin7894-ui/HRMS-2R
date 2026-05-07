@@ -70,6 +70,18 @@ function AppraisalAutoFill({ form, setForm, setOptions }) {
                 overall_rating: avgRating || ''
               }));
             }
+
+            // Auto-fetch Template Assignment
+            api.get('/template-assignments', { params: { HRMS_employee_id: eid, limit: 1 } }).then(taRes => {
+              const ta = taRes.data?.[0];
+              if (ta) {
+                setForm(p => ({
+                  ...p,
+                  HRMS_template_assignment_id: ta.id,
+                  HRMS_template_master_id: p.HRMS_template_master_id || ta.HRMS_template_master_id || ''
+                }));
+              }
+            });
           }).catch(() => {
             // Fallback if appraisal-ratings fetch fails
             if (latestAppr) {
@@ -90,6 +102,18 @@ function AppraisalAutoFill({ form, setForm, setOptions }) {
       }).catch(() => { });
     }
   }, [form.HRMS_employee_id, form.HRMS_appraisal_cycle_id, form.id, setForm, setOptions]);
+
+  // Handle manual Template Assignment selection -> update Template
+  useEffect(() => {
+    const taid = form.HRMS_template_assignment_id;
+    if (taid && !form.id) { // Only auto-update template on selection if it's a new record
+      api.get(`/template-assignments/${taid}`).then(res => {
+        if (res.data?.HRMS_template_master_id) {
+          setForm(p => ({ ...p, HRMS_template_master_id: res.data.HRMS_template_master_id }));
+        }
+      });
+    }
+  }, [form.HRMS_template_assignment_id, setForm, form.id]);
 
   // Fetch Current Grade when Assignment changes
   useEffect(() => {
@@ -163,6 +187,7 @@ export default function AppraisalsPage() {
       { key: 'HRMS_grade_ladder_id', label: 'Grade ladder', type: 'lov', lovEndpoint: 'grade-ladders', labelFn: o => o.Ladder_Name },
       { key: 'current_grade_id', label: 'Current grade', type: 'lov', lovEndpoint: 'grades', labelFn: o => o.Grade_Name, readOnly: true },
       { key: 'HRMS_template_master_id', label: 'Template', type: 'lov', lovEndpoint: 'template-masters', labelFn: o => o.Template_Name },
+      { key: 'HRMS_template_assignment_id', label: 'Template assignment', type: 'lov', lovEndpoint: 'template-assignments', labelFn: o => `${o._templateName || o.HRMS_template_master_id || ''} — ${o.Employee_Name || o._empName || o._applicantName || o.HRMS_employee_id || ''}` },
       { key: 'review_period', label: 'Review period', type: 'select', options: REVIEW_PERIOD },
       { key: 'reviewer_employee_id', label: 'Reviewer', type: 'lov', lovEndpoint: 'employees', labelFn: o => `${o.First_Name} ${o.Last_Name}` },
       { key: 'overall_rating', label: 'Overall rating', numeric: true, min: 1, max: 10, help: 'Auto-fetched from average HR rating for the selected employee and appraisal cycle. Editable if needed.' },

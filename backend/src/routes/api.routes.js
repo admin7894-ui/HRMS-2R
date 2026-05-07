@@ -421,8 +421,11 @@ r.get('/template-assignments', (req, res) => {
     all = all.map(x => {
       const app  = (db.applications||[]).find(a => a.id === x.HRMS_Application_ID);
       const tmpl = (db.template_masters||[]).find(t => t.id === x.HRMS_Template_Master_ID);
+      const emp  = (db.employees||[]).find(e => e.id === x.HRMS_employee_id);
+      const Employee_Name = emp ? `${emp.First_Name} ${emp.Last_Name}`.trim() : null;
       return { ...x, _applicantName: app  ? `${app.First_Name} ${app.Last_Name}`.trim() : null,
-                      _templateName: tmpl ? tmpl.Template_Name : null };
+                      _templateName: tmpl ? tmpl.Template_Name : null,
+                      _empName: Employee_Name, Employee_Name };
     });
     const pg=Math.max(1,+req.query.page||1), lim=Math.min(200,+req.query.limit||10);
     res.json({ success:true, data:all.slice((pg-1)*lim,pg*lim), total:all.length, page:pg, limit:lim, pages:Math.ceil(all.length/lim) });

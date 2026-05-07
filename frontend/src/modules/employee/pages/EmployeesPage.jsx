@@ -72,7 +72,7 @@ export default function EmployeesPage() {
       {key:'Last_Name',       label:'Last name',   required:true, type:'alpha', section:'Personal'},
       {key:'Date_of_Birth',   label:'Date of birth', required:true, type:'date', section:'Personal'},
       {key:'Gender',          label:'Gender',      required:true, type:'select', options:GENDER, section:'Personal'},
-      {key:'Gender_Other',    label:'Other gender (specify)', section:'Personal', tooltip:'Fill if gender is Other. Alphabets only, 5–30 chars.'},
+      // {key:'Gender_Other',    label:'Other gender (specify)', section:'Personal', tooltip:'Fill if gender is Other. Alphabets only, 5–30 chars.'},
       {key:'Marital_Status',  label:'Marital status', required:true, type:'select', options:MARITAL, section:'Personal'},
       {key:'Nationality',     label:'Nationality', required:true, type:'alpha', section:'Personal'},
       // ── Employment (auto-filled from hire record) ──────────────────────────
