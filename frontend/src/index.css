@@ -77,6 +77,20 @@
 
   /* Filter panel */
   .filter-panel { @apply absolute right-0 top-full mt-1 z-30 bg-white border border-gray-200 rounded-xl shadow-xl p-4 min-w-64 max-h-80 overflow-y-auto; }
+
+  /* Calendar Styles */
+  .cal-grid { @apply grid grid-cols-7 gap-px bg-gray-200 border border-gray-200 rounded-xl overflow-hidden shadow-sm; }
+  .cal-head { @apply bg-gray-50 py-3 text-center text-[11px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-200; }
+  .cal-cell { @apply bg-white min-h-[120px] p-3 transition-colors relative flex flex-col gap-1; }
+  .cal-cell-muted { @apply bg-gray-50/50; }
+  .cal-cell-sun { @apply bg-gray-100/80; }
+  .cal-day-num { @apply text-sm font-semibold text-gray-400; }
+  .cal-day-num-sun { @apply text-red-400; }
+  .cal-holiday { @apply text-[10px] px-2 py-1.5 rounded-lg border font-medium cursor-pointer transition-all hover:scale-[1.02] active:scale-95 shadow-sm truncate max-w-full; }
+  .cal-holiday-nat { @apply bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100; }
+  .cal-holiday-rel { @apply bg-purple-50 text-purple-700 border-purple-100 hover:bg-purple-100; }
+  .cal-holiday-other { @apply bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100; }
+  .cal-nav-btn { @apply p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-600; }
 }
 
 ::-webkit-scrollbar { width: 5px; height: 5px; }

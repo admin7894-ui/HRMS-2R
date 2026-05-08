@@ -36,12 +36,30 @@ const INIT = {
 
 function validateStep(step, form) {
   const e = {};
+  const today = new Date();
+  const getAge = (dob) => {
+    const d = new Date(dob);
+    let age = today.getFullYear() - d.getFullYear();
+    const m = today.getMonth() - d.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
+    return age;
+  };
+
   if (step === 0) {
     if (!form.company_id) e.company_id = 'Required';
     if (!RE.name.test(form.First_Name)) e.First_Name = 'Required, 2–50 letters';
     if (!RE.name.test(form.Last_Name)) e.Last_Name = 'Required, 2–50 letters';
     if (form.Middle_Name && !/^[a-zA-Z\s]{0,50}$/.test(form.Middle_Name)) e.Middle_Name = 'Max 50 letters';
-    if (!form.Date_of_Birth) e.Date_of_Birth = 'Required';
+    
+    if (!form.Date_of_Birth) {
+      e.Date_of_Birth = 'Required';
+    } else {
+      const age = getAge(form.Date_of_Birth);
+      if (new Date(form.Date_of_Birth) > today) e.Date_of_Birth = 'Future dates not allowed';
+      else if (age < 18) e.Date_of_Birth = 'Candidate must be at least 18 years old';
+      else if (age > 70) e.Date_of_Birth = 'Candidate must be at most 70 years old';
+    }
+
     if (!form.Gender) e.Gender = 'Required';
     if (!form.Marital_Status) e.Marital_Status = 'Required';
     if (!form.Nationality) e.Nationality = 'Required';
@@ -84,8 +102,29 @@ function validateStep(step, form) {
       if (!RE.co.test(form.Prev_Designation)) e.Prev_Designation = 'Required';
       if (!RE.co.test(form.Prev_Department)) e.Prev_Department = 'Required';
       if (!RE.ind.test(form.Industry_Type)) e.Industry_Type = 'Required';
-      if (!form.Exp_Start_Date) e.Exp_Start_Date = 'Required';
-      if (!form.Exp_End_Date) e.Exp_End_Date = 'Required';
+      
+      const sDate = form.Exp_Start_Date ? new Date(form.Exp_Start_Date) : null;
+      const edDate = form.Exp_End_Date ? new Date(form.Exp_End_Date) : null;
+      const cDob = form.Date_of_Birth ? new Date(form.Date_of_Birth) : null;
+
+      if (!sDate) {
+        e.Exp_Start_Date = 'Required';
+      } else {
+        if (sDate > today) e.Exp_Start_Date = 'Start date cannot be in the future';
+        if (cDob) {
+          const fourteenYearsAfterDob = new Date(cDob);
+          fourteenYearsAfterDob.setFullYear(fourteenYearsAfterDob.getFullYear() + 14);
+          if (sDate < fourteenYearsAfterDob) e.Exp_Start_Date = 'Start date must be at least 14 years after DOB';
+        }
+      }
+
+      if (!edDate) {
+        e.Exp_End_Date = 'Required';
+      } else {
+        if (edDate > today) e.Exp_End_Date = 'End date cannot be in the future';
+        if (sDate && edDate <= sDate) e.Exp_End_Date = 'End date must be after start date';
+      }
+
       if (!RE.exp.test(form.Total_Experience)) e.Total_Experience = '0–40 years';
       if (!RE.sal.test(form.Last_Drawn_Salary)) e.Last_Drawn_Salary = '4–10 digit salary';
     }
@@ -93,7 +132,35 @@ function validateStep(step, form) {
   } else if (step === 6) {
     if (!RE.name.test(form.Nominee_Name)) e.Nominee_Name = 'Required, 2–50 letters';
     if (!form.Nominee_Relationship) e.Nominee_Relationship = 'Required';
-    if (!form.Nominee_Date_of_Birth) e.Nominee_Date_of_Birth = 'Required';
+    
+    if (!form.Nominee_Date_of_Birth) {
+      e.Nominee_Date_of_Birth = 'Required';
+    } else {
+      const nDob = new Date(form.Nominee_Date_of_Birth);
+      const nAge = getAge(form.Nominee_Date_of_Birth);
+      const cDob = new Date(form.Date_of_Birth);
+      
+      if (nDob > today) {
+        e.Nominee_Date_of_Birth = 'Future dates not allowed';
+      } else if (nAge > 100) {
+        e.Nominee_Date_of_Birth = 'Nominee age cannot exceed 100 years';
+      } else {
+        const rel = form.Nominee_Relationship;
+        if (rel === 'Son' || rel === 'Daughter') {
+          if (nDob <= cDob) e.Nominee_Date_of_Birth = 'Nominee must be born after the candidate';
+          else if (nAge > 40) e.Nominee_Date_of_Birth = 'Nominee age must not exceed 40 years';
+        } else if (rel === 'Father' || rel === 'Mother') {
+          const ageDiff = cDob.getFullYear() - nDob.getFullYear();
+          // More precise check for "at least 18 years older"
+          const eighteenYearsAfterNominee = new Date(nDob);
+          eighteenYearsAfterNominee.setFullYear(eighteenYearsAfterNominee.getFullYear() + 18);
+          if (cDob < eighteenYearsAfterNominee) e.Nominee_Date_of_Birth = 'Nominee must be at least 18 years older than candidate';
+        } else if (rel === 'Spouse') {
+          if (nAge < 18) e.Nominee_Date_of_Birth = 'Nominee must be at least 18 years old';
+        }
+      }
+    }
+
     if (!RE.phone.test(form.Nominee_Contact_Number)) e.Nominee_Contact_Number = '10-digit mobile';
   } else if (step === 7) {
     if (!form.HRMS_Job_Posting_ID) e.HRMS_Job_Posting_ID = 'Required';
@@ -204,7 +271,60 @@ export default function ApplyNow() {
       .catch(() => {});
   }, []);
 
-  const set = useCallback((k, v) => setFormState(p => ({ ...p, [k]: v })), []);
+  const set = useCallback((k, v) => {
+    setFormState(p => {
+      const next = { ...p, [k]: v };
+      
+      // Real-time Validation for Work Experience
+      if (k === 'Exp_Start_Date' || k === 'Exp_End_Date' || k === 'Date_of_Birth') {
+        const today = new Date().toISOString().split('T')[0];
+        const sStr = next.Exp_Start_Date;
+        const eStr = next.Exp_End_Date;
+        const bStr = next.Date_of_Birth;
+
+        setErrors(prev => {
+          const newErrs = { ...prev };
+          delete newErrs.Exp_Start_Date;
+          delete newErrs.Exp_End_Date;
+
+          if (sStr) {
+            if (sStr > today) newErrs.Exp_Start_Date = 'Start date cannot be a future date';
+            if (bStr) {
+              const b = new Date(bStr);
+              const s = new Date(sStr);
+              const minS = new Date(b);
+              minS.setFullYear(minS.getFullYear() + 14);
+              if (s < minS) newErrs.Exp_Start_Date = 'Start date must be at least 14 years after DOB';
+            }
+          }
+          
+          if (eStr) {
+            if (eStr > today) newErrs.Exp_End_Date = 'End date cannot be in the future';
+            if (sStr && eStr <= sStr) newErrs.Exp_End_Date = 'End date must be after start date';
+          }
+          
+          return newErrs;
+        });
+      }
+
+      // Auto-calculate Total Experience
+      if (k === 'Exp_Start_Date' || k === 'Exp_End_Date') {
+        if (next.Exp_Start_Date && next.Exp_End_Date) {
+          const s = new Date(next.Exp_Start_Date);
+          const e = new Date(next.Exp_End_Date);
+          if (e > s) {
+            const diffMs = e - s;
+            const years = diffMs / (1000 * 60 * 60 * 24 * 365.25);
+            next.Total_Experience = years.toFixed(1);
+          } else {
+            next.Total_Experience = '';
+          }
+        }
+      }
+      
+      return next;
+    });
+  }, []);
   const f = { form, errors, set };
 
   const next = () => {
@@ -234,6 +354,11 @@ export default function ApplyNow() {
 
   const restart = () => { setOpen(false); setStep(0); setFormState(INIT); setErrors({}); setDone(false); };
 
+  const today = new Date().toISOString().split('T')[0];
+  const eighteenYearsAgo = new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0];
+  const seventyYearsAgo = new Date(new Date().setFullYear(new Date().getFullYear() - 70)).toISOString().split('T')[0];
+  const hundredYearsAgo = new Date(new Date().setFullYear(new Date().getFullYear() - 100)).toISOString().split('T')[0];
+
   const sections = [
     // 0 Personal
     <div>
@@ -243,7 +368,7 @@ export default function ApplyNow() {
         <Inp f={f} k='First_Name' label='First Name *'/>
         <Inp f={f} k='Middle_Name' label='Middle Name'/>
         <Inp f={f} k='Last_Name' label='Last Name *'/>
-        <Inp f={f} k='Date_of_Birth' label='Date of Birth *' type='date'/>
+        <Inp f={f} k='Date_of_Birth' label='Date of Birth *' type='date' min={seventyYearsAgo} max={eighteenYearsAgo}/>
         <Sel f={f} k='Gender' label='Gender *' opts={GENDER_OPT}/>
         <Sel f={f} k='Marital_Status' label='Marital Status *' opts={MARITAL_OPT}/>
         <Sel f={f} k='Nationality' label='Nationality *' opts={NATIONALITY_OPT}/>
@@ -306,7 +431,25 @@ export default function ApplyNow() {
     <div>
       <div style={S.sh2}>{icons[5]} Work Experience</div>
       <div style={S.toggle}>
-        <div style={S.togBox(form.Is_Fresher)} onClick={() => set('Is_Fresher', !form.Is_Fresher)}>
+        <div style={S.togBox(form.Is_Fresher)} onClick={() => {
+          const nextVal = !form.Is_Fresher;
+          set('Is_Fresher', nextVal);
+          if (nextVal) {
+            setFormState(p => ({
+              ...p,
+              Is_Fresher: true,
+              Prev_Company_Name: '',
+              Prev_Designation: '',
+              Prev_Department: '',
+              Industry_Type: '',
+              Exp_Start_Date: '',
+              Exp_End_Date: '',
+              Total_Experience: '',
+              Last_Drawn_Salary: '',
+              Reason_For_Leaving: ''
+            }));
+          }
+        }}>
           <div style={S.togThumb(form.Is_Fresher)}/>
         </div>
         <span style={{fontSize:15, fontWeight:600, color: form.Is_Fresher ? '#34d399' : '#94a3b8'}}>I am a Fresher (no prior experience)</span>
@@ -317,9 +460,9 @@ export default function ApplyNow() {
           <Inp f={f} k='Prev_Designation' label='Designation *'/>
           <Inp f={f} k='Prev_Department' label='Department *'/>
           <Inp f={f} k='Industry_Type' label='Industry *'/>
-          <Inp f={f} k='Exp_Start_Date' label='Start Date *' type='date'/>
-          <Inp f={f} k='Exp_End_Date' label='End Date *' type='date'/>
-          <Inp f={f} k='Total_Experience' label='Total Experience (yrs) *' placeholder='e.g. 3.5'/>
+          <Inp f={f} k='Exp_Start_Date' label='Start Date *' type='date' max={today}/>
+          <Inp f={f} k='Exp_End_Date' label='End Date *' type='date' max={today}/>
+          <Inp f={f} k='Total_Experience' label='Total Experience (yrs) *' placeholder='e.g. 3.5' readOnly/>
           <Inp f={f} k='Last_Drawn_Salary' label='Last Drawn Salary *' placeholder='e.g. 450000'/>
           <div style={{gridColumn:'1/-1'}}><Inp f={f} k='Reason_For_Leaving' label='Reason For Leaving'/></div>
         </div>
@@ -331,7 +474,7 @@ export default function ApplyNow() {
       <div style={S.grid}>
         <Inp f={f} k='Nominee_Name' label='Nominee Name *'/>
         <Sel f={f} k='Nominee_Relationship' label='Relationship *' opts={NOMINEE_REL}/>
-        <Inp f={f} k='Nominee_Date_of_Birth' label='Nominee DOB *' type='date'/>
+        <Inp f={f} k='Nominee_Date_of_Birth' label='Nominee DOB *' type='date' min={hundredYearsAgo} max={today}/>
         <Inp f={f} k='Nominee_Contact_Number' label='Nominee Contact *' maxLength={10}/>
       </div>
     </div>,
@@ -405,7 +548,13 @@ export default function ApplyNow() {
           <div style={S.nav}>
             {step > 0 ? <button style={S.btnSec} onClick={prev}>← Previous</button> : <span/>}
             {step < STEPS.length - 1
-              ? <button style={S.btnPri} onClick={next}>Next →</button>
+              ? <button 
+                  style={{...S.btnPri, opacity: (step === 5 && (errors.Exp_Start_Date || errors.Exp_End_Date)) ? .6 : 1}} 
+                  onClick={next}
+                  disabled={step === 5 && (errors.Exp_Start_Date || errors.Exp_End_Date)}
+                >
+                  Next →
+                </button>
               : <button style={{...S.btnPri, opacity: submitting ? .6 : 1}} onClick={submit} disabled={submitting}>
                   {submitting ? 'Submitting…' : '🚀 Submit Application'}
                 </button>

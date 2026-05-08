@@ -16,6 +16,7 @@ const GenericModule = ({
   dataTransformer,
   onSuccess,
   extraActions,
+  staticFilters = {},
 }) => {
   const { user } = useAuth();
   const [data, setData] = useState([]);
@@ -88,7 +89,13 @@ const GenericModule = ({
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const r = await crud.list({ page, limit: perPage, ...(search ? { q: search } : {}), ...(sortBy ? { sortBy, sortOrder } : {}) });
+      const r = await crud.list({ 
+        page, 
+        limit: perPage, 
+        ...(search ? { q: search } : {}), 
+        ...(sortBy ? { sortBy, sortOrder } : {}),
+        ...staticFilters 
+      });
       let fetchedData = r.data || [];
       if (dataTransformer) {
         fetchedData = dataTransformer(fetchedData);
@@ -98,7 +105,7 @@ const GenericModule = ({
       setPages(r.pages || 1);
     } catch (e) { toast.error(e.message || 'Load failed'); }
     finally { setLoading(false); }
-  }, [endpoint, page, perPage, search, sortBy, sortOrder]);
+  }, [endpoint, page, perPage, search, sortBy, sortOrder, JSON.stringify(staticFilters)]);
 
   useEffect(() => { load(); }, [load]);
 
