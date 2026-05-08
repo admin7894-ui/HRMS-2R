@@ -371,15 +371,26 @@ const GenericModule = ({
           }}
           className="input py-1.5" accept={f.accept || '*'}/>
         {val && (
-          <p className="hint flex items-center gap-2 mt-1">
-            📎 {typeof val === 'string' && (val.includes('/') || val.includes('\\')) ? (
-              <a href={val.startsWith('http') ? val : `http://localhost:5000${val}`} 
-                 target="_blank" rel="noreferrer" 
-                 className="text-primary-600 underline font-medium hover:text-primary-800">
-                View/Download: {val.split(/[/\\]/).pop()}
-              </a>
-            ) : <span>{val}</span>}
-          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <button
+              type="button"
+              onClick={() => {
+                const url = val.startsWith('http') ? val : `http://localhost:5000${val}`;
+                window.open(url, '_blank');
+              }}
+              className="text-primary-600 underline font-medium hover:text-primary-800 text-xs"
+            >
+              👁 View
+            </button>
+            <a
+              href={val.startsWith('http') ? val : `http://localhost:5000${val}`}
+              download={val.split(/[/\\]/).pop()}
+              className="text-emerald-600 underline font-medium hover:text-emerald-800 text-xs"
+            >
+              📥 Download
+            </a>
+            <span className="text-gray-400 text-[10px]">({val.split(/[/\\]/).pop()})</span>
+          </div>
         )}
       </Field>
     );

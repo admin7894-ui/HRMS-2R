@@ -94,7 +94,11 @@ Textarea.displayName = 'Textarea';
 // ── LOV Dropdown (active records only, ID-Name format, NO raw GUIDs) ─────────
 export const LOV = ({ label, name, value, onChange, error, required, options = [], valueKey = 'id', labelFn, disabled, tooltip }) => {
   const getLabel = o => {
-    if (labelFn) return labelFn(o);
+    try {
+      if (labelFn) return labelFn(o);
+    } catch (e) {
+      console.error('LOV labelFn error:', e);
+    }
     const did = o._displayId;
     for (const k of ['Module_Name','BG_Name','Business_Type_Name','Company_Name','Department_Name',
       'Role_Name','Designation_Name','Grade_Name','Job_Name','Position_Name','Status_Name',
@@ -252,6 +256,30 @@ export const ViewModal = ({ open, onClose, title, record, cols, sections, fields
     if (type === 'currency') return '₹' + Number(val).toLocaleString('en-IN');
     if (type === 'badge') return <Badge value={val}/>;
     if (val === 'Y') return 'Yes'; if (val === 'N') return 'No';
+
+    // File handling in View Mode
+    if (typeof val === 'string' && (val.includes('/uploads/') || val.toLowerCase().endsWith('.pdf') || val.toLowerCase().endsWith('.jpg') || val.toLowerCase().endsWith('.png'))) {
+      const url = val.startsWith('http') ? val : `http://localhost:5000${val}`;
+      return (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => window.open(url, '_blank')}
+            className="text-primary-600 hover:text-primary-800 underline font-semibold"
+            title="Open in new tab"
+          >
+            View
+          </button>
+          <a
+            href={url}
+            download={val.split('/').pop()}
+            className="text-emerald-600 hover:text-emerald-800 underline font-semibold"
+            title="Download to device"
+          >
+            Download
+          </a>
+        </div>
+      );
+    }
     return String(val);
   };
 
@@ -327,12 +355,26 @@ export const ViewModal = ({ open, onClose, title, record, cols, sections, fields
   return (
     <Modal open={open} onClose={onClose} title={`View: ${title}`} size="2xl">
       {record._displayId && (
-        <div className="mb-4 p-3 bg-primary-50 rounded-lg border border-primary-100 flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">{record._displayId?.slice(0,2)}</div>
-          <div>
-            <p className="text-xs text-primary-500 font-semibold uppercase">System ID</p>
-            <p className="text-lg font-extrabold text-primary-800 font-mono">{record._displayId}</p>
+        <div className="mb-4 p-3 bg-primary-50 rounded-lg border border-primary-100 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">{record._displayId?.slice(0,2)}</div>
+            <div>
+              <p className="text-xs text-primary-500 font-semibold uppercase">System ID</p>
+              <p className="text-lg font-extrabold text-primary-800 font-mono">{record._displayId}</p>
+            </div>
           </div>
+          {(record.Resume_File || record.Resume) && (
+            <button
+              onClick={() => {
+                const r = record.Resume_File || record.Resume;
+                const url = r.startsWith('http') ? r : `http://localhost:5000${r}`;
+                window.open(url, '_blank');
+              }}
+              className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-primary-700 transition-colors shadow-lg shadow-primary-200"
+            >
+              <span>📄</span> View Resume
+            </button>
+          )}
         </div>
       )}
       {orgFields.length > 0 && renderOrgSection()}

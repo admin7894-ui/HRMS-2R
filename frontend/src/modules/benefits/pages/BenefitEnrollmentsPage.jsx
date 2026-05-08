@@ -23,5 +23,12 @@ export default function BenefitEnrollmentsPage() {
       {key:'nominee_blood_group',label:'Blood group',type:'select',options:BLOOD},
       {key:'enrollment_status',label:'Enrollment status',type:'select',options:[{v:'ACTIVE',l:'Active'},{v:'INACTIVE',l:'Inactive'},{v:'PENDING',l:'Pending'},{v:'CANCELLED',l:'Cancelled'}]},
     ]}
+    customValidate={(f) => {
+      const e = {};
+      if (f.nominee_date_of_birth && new Date(f.nominee_date_of_birth) > new Date()) {
+        e.nominee_date_of_birth = 'Nominee DOB cannot be in the future';
+      }
+      return e;
+    }}
   />;
 }

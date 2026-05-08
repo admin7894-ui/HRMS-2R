@@ -234,17 +234,58 @@ function Sel({ f, k, label, opts }) {
 }
 
 function FileField({ f, k, label, accept, maxMB }) {
-  const handleFile = useCallback(e => {
+  const [uploading, setUploading] = useState(false);
+  
+  const handleFile = useCallback(async e => {
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > maxMB * 1024 * 1024) { alert(`Max size is ${maxMB}MB`); return; }
-    f.set(k, file.name);
+    
+    setUploading(true);
+    const fd = new FormData();
+    fd.append('file', file);
+    
+    try {
+      const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/public';
+      const r = await axios.post(apiBase + '/upload', fd, { 
+        headers: { 'Content-Type': 'multipart/form-data' } 
+      });
+      f.set(k, r.data.data.url);
+    } catch (err) {
+      alert('Upload failed: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setUploading(false);
+    }
   }, [f, k, maxMB]);
+
+  const viewFile = (e) => {
+    e.stopPropagation();
+    const url = f.form[k];
+    if (!url) return;
+    const fullUrl = url.startsWith('http') ? url : (import.meta.env.VITE_API_URL || 'http://localhost:5000') + url;
+    window.open(fullUrl, '_blank');
+  };
+
   return (
     <Field label={label} error={f.errors[k]}>
-      <div style={S.fileBox(f.errors[k])} onClick={() => document.getElementById('fu_'+k).click()}>
+      <div style={S.fileBox(f.errors[k])} onClick={() => !uploading && document.getElementById('fu_'+k).click()}>
         <input id={'fu_'+k} type='file' accept={accept} style={{display:'none'}} onChange={handleFile}/>
-        {f.form[k] ? <><div style={{fontSize:22}}>✅</div><div style={{color:'#34d399',fontSize:13,marginTop:4}}>{f.form[k]}</div></>
+        {uploading ? <div style={{fontSize:13, color:'#94a3b8'}}>⌛ Uploading...</div>
+          : f.form[k] ? (
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
+              <div style={{fontSize:22}}>✅</div>
+              <div style={{color:'#34d399',fontSize:12,marginTop:4,maxWidth:'100%',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+                {f.form[k].split('/').pop()}
+              </div>
+              <button 
+                type="button"
+                onClick={viewFile}
+                style={{marginTop:8, background:'rgba(124,58,237,0.2)', border:'1.5px solid #7c3aed', color:'#a78bfa', fontSize:11, fontWeight:700, padding:'4px 12px', borderRadius:6, cursor:'pointer'}}
+              >
+                👁 View Document
+              </button>
+            </div>
+          )
           : <><div style={{fontSize:28, color:'#7c3aed'}}>📎</div><div style={{fontSize:13,color:'#64748b',marginTop:6}}>Click to upload · {accept} · max {maxMB}MB</div></>}
       </div>
     </Field>

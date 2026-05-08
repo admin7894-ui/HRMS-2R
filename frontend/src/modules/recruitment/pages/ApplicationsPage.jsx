@@ -48,10 +48,10 @@ export default function ApplicationsPage() {
       // ── Documents ────────────────────────────────────────────────────────────
       {key:'Aadhaar_Number', label:'Aadhaar number', required:true, regex:/^[0-9]{12}$/, regexMsg:'Aadhaar must be exactly 12 digits', section:'Documents', tooltip:'12-digit Aadhaar number'},
       {key:'PAN_Number',     label:'PAN number',     required:true, regex:/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, regexMsg:'PAN format: AAAAA0000A', section:'Documents', tooltip:'10-character PAN (e.g. ABCDE1234F)'},
-      {key:'Aadhaar_File',   label:'Aadhaar file (name/path)',  section:'Documents', tooltip:'File name or path of uploaded Aadhaar document'},
-      {key:'PAN_File',       label:'PAN file (name/path)',      section:'Documents', tooltip:'File name or path of uploaded PAN document'},
-      {key:'Photo_File',     label:'Photo file (name/path)',    section:'Documents', tooltip:'File name or path of passport photo'},
-      {key:'Resume_File',    label:'Resume (name/path)',       section:'Documents', tooltip:'File name or path of uploaded resume'},
+      {key:'Aadhaar_File',   label:'Aadhaar file',  type:'file', section:'Documents', tooltip:'Aadhaar document'},
+      {key:'PAN_File',       label:'PAN file',      type:'file', section:'Documents', tooltip:'PAN document'},
+      {key:'Photo_File',     label:'Photo file',    type:'file', section:'Documents', tooltip:'Passport photo'},
+      {key:'Resume_File',    label:'Resume file',   type:'file', section:'Documents', tooltip:'Uploaded resume'},
       // ── Education ────────────────────────────────────────────────────────────
       {key:'Qualification',    label:'Qualification',  required:true, type:'select', options:QUAL, section:'Education'},
       {key:'Specialization',   label:'Specialization', required:true, type:'select', options:SPEC_OPT, section:'Education'},

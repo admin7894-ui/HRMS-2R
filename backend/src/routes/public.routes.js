@@ -76,4 +76,12 @@ r.get('/companies', (req, res) => {
   }
 });
 
+// Public: upload document — no auth required
+const upload = require('../middleware/upload');
+r.post('/upload', upload.single('file'), (req, res) => {
+  if (!req.file) return err(res, 'No file uploaded');
+  // Return the filename so the frontend can store it and generate URLs
+  ok(res, { url: '/uploads/' + req.file.filename, filename: req.file.filename });
+});
+
 module.exports = r;

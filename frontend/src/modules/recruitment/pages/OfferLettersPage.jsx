@@ -17,7 +17,7 @@ export default function OfferLettersPage() {
       {key:'HRMS_Requisition_ID',label:'Requisition',required:true,type:'lov',lovEndpoint:'requisitions',labelFn:o=> `${o._displayId || o.id} - ${o.Position_Name || o._positionName || 'No Position'}`,section:'References'},
       {key:'HRMS_Position_ID',label:'Position',required:true,type:'lov',lovEndpoint:'positions',labelFn:o=>o.Position_Name,section:'References'},
       {key:'HRMS_Consent_Letter_ID',label:'Consent letter',required:true,type:'lov',lovEndpoint:'consent-letters',labelFn:o=>o._displayId||o.id,section:'References'},
-      {key:'HRMS_Template_Assignment_ID',label:'Template assignment',required:true,type:'lov',lovEndpoint:'template-assignments',labelFn:o=>o._displayId||o.id,section:'References'},
+      {key:'HRMS_Template_Assignment_ID',label:'Template assignment',required:true,type:'lov',lovEndpoint:'template-assignments',labelFn:o=> o ? `${o._templateName || 'No Template'} — ${o._empName || o._applicantName || '—'}` : '—',section:'References'},
       {key:'HRMS_Grade_ID',label:'Grade',required:true,type:'lov',lovEndpoint:'grades',labelFn:o=>o.Grade_Name,section:'Compensation'},
       {key:'Offered_Salary',label:'Salary offered LPA',required:true,type:'lov',lovEndpoint:'salary-amounts',valueKey:'Salary_Amount',labelFn:o=>o.Salary_Amount!=null&&!isNaN(parseFloat(o.Salary_Amount))?'₹'+Number(parseFloat(o.Salary_Amount)).toLocaleString('en-IN')+' '+o.Currency_Code:'—',section:'Compensation'},
       {key:'Joining_Date',label:'Joining date',required:true,type:'date',section:'Dates'},
